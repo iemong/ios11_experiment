@@ -42,7 +42,7 @@ var successCallback = function successCallback(stream) {
 };
 
 var errorCallback = function errorCallback(err) {
-    //alert(err);
+    console.log(err);
 };
 
 navigator.mediaDevices.getUserMedia(medias).then(successCallback).catch(errorCallback);
