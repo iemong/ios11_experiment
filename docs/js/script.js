@@ -18,15 +18,15 @@ var successCallback = function successCallback(stream) {
         var audioContext = new (window.AudioContext || window.webkitAudioContext)();
         var sourceNode = audioContext.createMediaStreamSource(stream);
         var analyserNode = audioContext.createAnalyser();
-        analyserNode.fftSize = 2048;
+        analyserNode.fftSize = 1024;
         sourceNode.connect(analyserNode);
         sourceNode.connect(audioContext.destination);
-        function draw() {
+        var draw = function draw() {
             var barWidth = canvas.width / analyserNode.fftSize;
             var array = new Uint8Array(analyserNode.fftSize);
             analyserNode.getByteTimeDomainData(array);
             drawContext.fillStyle = 'rgba(0, 0, 0, 1)';
-            drawContext.fillRect(0, 0, canvas.width, ch);
+            drawContext.fillRect(0, 0, cw, ch);
 
             for (var i = 0; i < analyserNode.fftSize; ++i) {
                 var value = array[i];
@@ -39,8 +39,7 @@ var successCallback = function successCallback(stream) {
             }
 
             requestAnimationFrame(draw);
-        }
-
+        };
         draw();
     });
 };

@@ -15,15 +15,15 @@ const successCallback = (stream) => {
         const audioContext = new (window.AudioContext || window.webkitAudioContext);
         const sourceNode = audioContext.createMediaStreamSource(stream);
         const analyserNode = audioContext.createAnalyser();
-        analyserNode.fftSize = 2048;
+        analyserNode.fftSize = 1024;
         sourceNode.connect(analyserNode);
         sourceNode.connect(audioContext.destination);
-        function draw() {
+        const draw = () => {
             const barWidth = canvas.width / analyserNode.fftSize;
             const array = new Uint8Array(analyserNode.fftSize);
             analyserNode.getByteTimeDomainData(array);
             drawContext.fillStyle = 'rgba(0, 0, 0, 1)';
-            drawContext.fillRect(0, 0, canvas.width, ch);
+            drawContext.fillRect(0, 0, cw, ch);
 
             for (let i = 0; i < analyserNode.fftSize; ++i) {
                 const value = array[i];
@@ -36,9 +36,8 @@ const successCallback = (stream) => {
             }
 
             requestAnimationFrame(draw);
-        }
-
-        draw(); 
+        };
+        draw();
     });
 };
 
