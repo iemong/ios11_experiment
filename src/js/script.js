@@ -11,7 +11,6 @@ const ch = canvas.height;
 // };
 
 const successCallback = (stream) => {
-    video.srcObject = stream; 
     const audioContext = new (window.AudioContext || window.webkitAudioContext);
     const sourceNode = audioContext.createMediaStreamSource(stream);
     const analyserNode = audioContext.createAnalyser();
