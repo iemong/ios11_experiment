@@ -1,4 +1,4 @@
-const medias = {audio : true, video : false};
+const medias = {audio : true, video : true};
 const audio = document.getElementById('audio');
 const canvas = document.querySelector('#canvas');
 const video = document.getElementById('video');
@@ -9,15 +9,15 @@ const ch = canvas.height;
 // const successCallback = (stream) => {
 //     audio.srcObject = stream;
 // };
+
 const successCallback = (stream) => {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    const audioContext = new AudioContext();
-    const sourceNode = audioContext.createMediaStreamSource(stream);
-    console.log(sourceNode);
     video.srcObject = stream; 
+    const audioContext = new (window.AudioContext || window.webkitAudioContext);
+    const sourceNode = audioContext.createMediaStreamSource(stream);
     const analyserNode = audioContext.createAnalyser();
     analyserNode.fftSize = 2048;
     sourceNode.connect(analyserNode);
+    
     sourceNode.connect(audioContext.destination);
     function draw() {
         const barWidth = canvas.width / analyserNode.fftSize;
