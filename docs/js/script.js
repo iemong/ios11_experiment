@@ -25,7 +25,27 @@ var successCallback = function successCallback(stream) {
         console.log('touched');
         ocillatorNode.start();
         sourceNode.connect(audioContext.destination);
+        draw();
     });
+    function draw(_analyser) {
+        var barWidth = canvas.width / _analyser.fftSize;
+        var array = new Uint8Array(_analyser.fftSize);
+        _analyser.getByteTimeDomainData(array);
+        drawContext.fillStyle = 'rgba(0, 0, 0, 1)';
+        drawContext.fillRect(0, 0, canvas.width, ch);
+
+        for (var i = 0; i < _analyser.fftSize; ++i) {
+            var value = array[i];
+            var percent = value / 255;
+            var height = canvas.height * percent;
+            var offset = canvas.height - height;
+
+            drawContext.fillStyle = 'lime';
+            drawContext.fillRect(i * barWidth, offset, barWidth, 2);
+        }
+
+        requestAnimationFrame(draw);
+    }
 };
 
 var errorCallback = function errorCallback(err) {
