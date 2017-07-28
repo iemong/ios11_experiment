@@ -12,6 +12,7 @@ var ch = canvas.height;
 //     audio.srcObject = stream;
 // };
 var successCallback = function successCallback(stream) {
+    var AudioContext = window.AudioContext || window.webkitAudioContext;
     var audioContext = new AudioContext();
     var sourceNode = audioContext.createMediaStreamSource(stream);
     var analyserNode = audioContext.createAnalyser();
