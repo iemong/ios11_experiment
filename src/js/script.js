@@ -17,8 +17,10 @@ const successCallback = (stream) => {
     analyserNode.fftSize = 2048;
     ocillatorNode.connect(audioContext.destination);
     ocillatorNode.frequency.value = 440;
-    window.addEventListener('click touchend', () => {
+    window.addEventListener('touchend', () => {
         ocillatorNode.start();
+        console.log('touched');
+        
     });
 };
 
