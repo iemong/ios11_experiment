@@ -1,4 +1,4 @@
-const medias = {audio : true, video : true};
+const medias = {audio : true, video : false};
 const audio = document.getElementById('audio');
 const canvas = document.querySelector('#canvas');
 const video = document.getElementById('video');
