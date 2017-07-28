@@ -16,16 +16,32 @@ var successCallback = function successCallback(stream) {
     var audioContext = new (window.AudioContext || window.webkitAudioContext)();
     var sourceNode = audioContext.createMediaStreamSource(stream);
     var analyserNode = audioContext.createAnalyser();
-    var ocillatorNode = audioContext.createOscillator();
     analyserNode.fftSize = 2048;
-    ocillatorNode.connect(audioContext.destination);
-    ocillatorNode.frequency.value = 440;
     var button = document.getElementById('button');
     button.addEventListener('touchend', function () {
-        console.log('touched');
-        ocillatorNode.start();
         sourceNode.connect(audioContext.destination);
     });
+    function draw() {
+        var barWidth = canvas.width / analyserNode.fftSize;
+        var array = new Uint8Array(analyserNode.fftSize);
+        analyserNode.getByteTimeDomainData(array);
+        drawContext.fillStyle = 'rgba(0, 0, 0, 1)';
+        drawContext.fillRect(0, 0, canvas.width, ch);
+
+        for (var i = 0; i < analyserNode.fftSize; ++i) {
+            var value = array[i];
+            var percent = value / 255;
+            var height = canvas.height * percent;
+            var offset = canvas.height - height;
+
+            drawContext.fillStyle = 'lime';
+            drawContext.fillRect(i * barWidth, offset, barWidth, 2);
+        }
+
+        requestAnimationFrame(draw);
+    }
+
+    draw();
 };
 
 var errorCallback = function errorCallback(err) {
