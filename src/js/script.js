@@ -1,7 +1,6 @@
-const medias = {audio : true, video : true};
+const medias = {audio : true, video : false};
 const audio = document.getElementById('audio');
 const canvas = document.querySelector('#canvas');
-const video = document.getElementById('video');
 const drawContext = canvas.getContext('2d');
 const cw = canvas.width;
 const ch = canvas.height;
@@ -11,19 +10,21 @@ const ch = canvas.height;
 // };
 
 const successCallback = (stream) => {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext);
+    const audioContext = new AudioContext();
+    // audio.srcObject = stream; 
+    // const sourceNode = audioContext.createMediaStreamSource(audio.srcObject);
     const sourceNode = audioContext.createMediaStreamSource(stream);
     const analyserNode = audioContext.createAnalyser();
     analyserNode.fftSize = 2048;
     sourceNode.connect(analyserNode);
-    
     sourceNode.connect(audioContext.destination);
+
     function draw() {
         const barWidth = canvas.width / analyserNode.fftSize;
         const array = new Uint8Array(analyserNode.fftSize);
         analyserNode.getByteTimeDomainData(array);
         drawContext.fillStyle = 'rgba(0, 0, 0, 1)';
-        drawContext.fillRect(0, 0, canvas.width, ch);
+        drawContext.fillRect(0, 0, cw, ch);
 
         for (let i = 0; i < analyserNode.fftSize; ++i) {
             const value = array[i];
