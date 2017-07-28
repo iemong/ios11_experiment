@@ -39,7 +39,7 @@ const successCallback = (stream) => {
 };
 
 const errorCallback = (err) => {
-    //alert(err);
+    console.log(err);
 };
 
 navigator.mediaDevices.getUserMedia(medias)
