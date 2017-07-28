@@ -15,34 +15,31 @@ const successCallback = (stream) => {
         const audioContext = new (window.AudioContext || window.webkitAudioContext);
         const sourceNode = audioContext.createMediaStreamSource(stream);
         const analyserNode = audioContext.createAnalyser();
-        const ocillatorNode = audioContext.createOscillator();
         analyserNode.fftSize = 2048;
-        //ocillatorNode.connect(sourceNode);
-        ocillatorNode.frequency.value = 440;
-        console.log('touched');
-        ocillatorNode.start();
+        sourceNode.connect(analyserNode);
         sourceNode.connect(audioContext.destination);
-        draw();
-    });
-    function draw(_analyser) {
-        const barWidth = canvas.width / _analyser.fftSize;
-        const array = new Uint8Array(_analyser.fftSize);
-        _analyser.getByteTimeDomainData(array);
-        drawContext.fillStyle = 'rgba(0, 0, 0, 1)';
-        drawContext.fillRect(0, 0, canvas.width, ch);
+        function draw() {
+            const barWidth = canvas.width / analyserNode.fftSize;
+            const array = new Uint8Array(analyserNode.fftSize);
+            analyserNode.getByteTimeDomainData(array);
+            drawContext.fillStyle = 'rgba(0, 0, 0, 1)';
+            drawContext.fillRect(0, 0, canvas.width, ch);
 
-        for (let i = 0; i < _analyser.fftSize; ++i) {
-            const value = array[i];
-            const percent = value / 255;
-            const height = canvas.height * percent;
-            const offset = canvas.height - height;
+            for (let i = 0; i < analyserNode.fftSize; ++i) {
+                const value = array[i];
+                const percent = value / 255;
+                const height = canvas.height * percent;
+                const offset = canvas.height - height;
 
-            drawContext.fillStyle = 'lime';
-            drawContext.fillRect(i * barWidth, offset, barWidth, 2);
+                drawContext.fillStyle = 'lime';
+                drawContext.fillRect(i * barWidth, offset, barWidth, 2);
+            }
+
+            requestAnimationFrame(draw);
         }
 
-        requestAnimationFrame(draw);
-    }
+        draw(); 
+    });
 };
 
 const errorCallback = (err) => {

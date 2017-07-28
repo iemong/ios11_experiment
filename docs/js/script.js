@@ -18,34 +18,31 @@ var successCallback = function successCallback(stream) {
         var audioContext = new (window.AudioContext || window.webkitAudioContext)();
         var sourceNode = audioContext.createMediaStreamSource(stream);
         var analyserNode = audioContext.createAnalyser();
-        var ocillatorNode = audioContext.createOscillator();
         analyserNode.fftSize = 2048;
-        //ocillatorNode.connect(sourceNode);
-        ocillatorNode.frequency.value = 440;
-        console.log('touched');
-        ocillatorNode.start();
+        sourceNode.connect(analyserNode);
         sourceNode.connect(audioContext.destination);
-        draw();
-    });
-    function draw(_analyser) {
-        var barWidth = canvas.width / _analyser.fftSize;
-        var array = new Uint8Array(_analyser.fftSize);
-        _analyser.getByteTimeDomainData(array);
-        drawContext.fillStyle = 'rgba(0, 0, 0, 1)';
-        drawContext.fillRect(0, 0, canvas.width, ch);
+        function draw() {
+            var barWidth = canvas.width / analyserNode.fftSize;
+            var array = new Uint8Array(analyserNode.fftSize);
+            analyserNode.getByteTimeDomainData(array);
+            drawContext.fillStyle = 'rgba(0, 0, 0, 1)';
+            drawContext.fillRect(0, 0, canvas.width, ch);
 
-        for (var i = 0; i < _analyser.fftSize; ++i) {
-            var value = array[i];
-            var percent = value / 255;
-            var height = canvas.height * percent;
-            var offset = canvas.height - height;
+            for (var i = 0; i < analyserNode.fftSize; ++i) {
+                var value = array[i];
+                var percent = value / 255;
+                var height = canvas.height * percent;
+                var offset = canvas.height - height;
 
-            drawContext.fillStyle = 'lime';
-            drawContext.fillRect(i * barWidth, offset, barWidth, 2);
+                drawContext.fillStyle = 'lime';
+                drawContext.fillRect(i * barWidth, offset, barWidth, 2);
+            }
+
+            requestAnimationFrame(draw);
         }
 
-        requestAnimationFrame(draw);
-    }
+        draw();
+    });
 };
 
 var errorCallback = function errorCallback(err) {
