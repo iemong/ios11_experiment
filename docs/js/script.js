@@ -16,10 +16,12 @@ var successCallback = function successCallback(stream) {
     var audioContext = new (window.AudioContext || window.webkitAudioContext)();
     var sourceNode = audioContext.createMediaStreamSource(stream);
     var analyserNode = audioContext.createAnalyser();
+    var ocillatorNode = audioContext.createOscillator();
     analyserNode.fftSize = 2048;
     console.log(sourceNode);
-
+    sourceNode.connect(ocillatorNode);
     sourceNode.connect(audioContext.destination);
+    ocillatorNode.start(0);
     function draw() {
         var barWidth = canvas.width / analyserNode.fftSize;
         var array = new Uint8Array(analyserNode.fftSize);
