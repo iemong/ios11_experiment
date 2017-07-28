@@ -20,7 +20,6 @@ var successCallback = function successCallback(stream) {
     var button = document.getElementById('button');
     button.addEventListener('touchend', function () {
         console.log("hoge");
-        sourceNode.connect(analyserNode);
         sourceNode.connect(audioContext.destination);
     });
     function draw() {

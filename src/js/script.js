@@ -17,7 +17,6 @@ const successCallback = (stream) => {
     const button = document.getElementById('button');
     button.addEventListener('touchend', () => {
         console.log("hoge");
-        sourceNode.connect(analyserNode);
         sourceNode.connect(audioContext.destination);
     });
     function draw() {
