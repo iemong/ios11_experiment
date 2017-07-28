@@ -10,10 +10,9 @@ const ch = canvas.height;
 // };
 
 const successCallback = (stream) => {
-    const audioContext = new AudioContext();
-    // audio.srcObject = stream; 
-    // const sourceNode = audioContext.createMediaStreamSource(audio.srcObject);
-    const sourceNode = audioContext.createMediaStreamSource(stream);
+    const audioContext = new (AudioContext() || webkitAudioContext());
+    audio.srcObject = stream; 
+    const sourceNode = audioContext.createMediaStreamSource(audio.srcObject);
     const analyserNode = audioContext.createAnalyser();
     analyserNode.fftSize = 2048;
     sourceNode.connect(analyserNode);
