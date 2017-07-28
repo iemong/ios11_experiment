@@ -17,7 +17,6 @@ const successCallback = (stream) => {
     analyserNode.fftSize = 2048;
     sourceNode.connect(analyserNode);
     sourceNode.connect(audioContext.destination);
-
     function draw() {
         const barWidth = canvas.width / analyserNode.fftSize;
         const array = new Uint8Array(analyserNode.fftSize);
