@@ -18,10 +18,9 @@ var successCallback = function successCallback(stream) {
     var analyserNode = audioContext.createAnalyser();
     var ocillatorNode = audioContext.createOscillator();
     analyserNode.fftSize = 2048;
-    console.log(sourceNode);
-    sourceNode.connect(ocillatorNode);
-    sourceNode.connect(audioContext.destination);
-    ocillatorNode.start(0);
+    ocillatorNode.connect(audioContext.destination);
+    ocillatorNode.frequency.value = 440;
+    ocillatorNode.start();
     function draw() {
         var barWidth = canvas.width / analyserNode.fftSize;
         var array = new Uint8Array(analyserNode.fftSize);
