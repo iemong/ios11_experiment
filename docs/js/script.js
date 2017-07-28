@@ -21,27 +21,6 @@ var successCallback = function successCallback(stream) {
     ocillatorNode.connect(audioContext.destination);
     ocillatorNode.frequency.value = 440;
     ocillatorNode.start();
-    function draw() {
-        var barWidth = canvas.width / analyserNode.fftSize;
-        var array = new Uint8Array(analyserNode.fftSize);
-        analyserNode.getByteTimeDomainData(array);
-        drawContext.fillStyle = 'rgba(0, 0, 0, 1)';
-        drawContext.fillRect(0, 0, cw, ch);
-
-        for (var i = 0; i < analyserNode.fftSize; ++i) {
-            var value = array[i];
-            var percent = value / 255;
-            var height = canvas.height * percent;
-            var offset = canvas.height - height;
-
-            drawContext.fillStyle = 'lime';
-            drawContext.fillRect(i * barWidth, offset, barWidth, 2);
-        }
-
-        requestAnimationFrame(draw);
-    }
-
-    draw();
 };
 
 var errorCallback = function errorCallback(err) {
