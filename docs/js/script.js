@@ -19,6 +19,7 @@ var successCallback = function successCallback(stream) {
     analyserNode.fftSize = 2048;
     var button = document.getElementById('button');
     button.addEventListener('touchend', function () {
+        sourceNode.connect(analyserNode);
         sourceNode.connect(audioContext.destination);
     });
     function draw() {
