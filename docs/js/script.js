@@ -14,11 +14,11 @@ var ch = canvas.height;
 
 var successCallback = function successCallback(stream) {
     var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    audio.srcObject = stream;
-    var sourceNode = audioContext.createMediaStreamSource(audio.srcObject);
+    var sourceNode = audioContext.createMediaStreamSource(stream);
     var analyserNode = audioContext.createAnalyser();
     analyserNode.fftSize = 2048;
-    sourceNode.connect(analyserNode);
+    console.log(sourceNode);
+
     sourceNode.connect(audioContext.destination);
     function draw() {
         var barWidth = canvas.width / analyserNode.fftSize;
