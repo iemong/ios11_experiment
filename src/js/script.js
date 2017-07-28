@@ -20,7 +20,6 @@ const successCallback = (stream) => {
     const button = document.getElementById('button');
     button.addEventListener('touchend', () => {
         console.log('touched');
-        ocillatorNode.start();
         sourceNode.connect(audioContext.destination);
     });
     
