@@ -13,16 +13,17 @@ var ch = canvas.height;
 // };
 
 var successCallback = function successCallback(stream) {
-    var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    var sourceNode = audioContext.createMediaStreamSource(stream);
-    var analyserNode = audioContext.createAnalyser();
-    var ocillatorNode = audioContext.createOscillator();
-    analyserNode.fftSize = 2048;
-    ocillatorNode.connect(audioContext.destination);
-    ocillatorNode.frequency.value = 440;
     var button = document.getElementById('button');
     button.addEventListener('touchend', function () {
+        var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        var sourceNode = audioContext.createMediaStreamSource(stream);
+        var analyserNode = audioContext.createAnalyser();
+        var ocillatorNode = audioContext.createOscillator();
+        analyserNode.fftSize = 2048;
+        //ocillatorNode.connect(sourceNode);
+        ocillatorNode.frequency.value = 440;
         console.log('touched');
+        ocillatorNode.start();
         sourceNode.connect(audioContext.destination);
     });
 };

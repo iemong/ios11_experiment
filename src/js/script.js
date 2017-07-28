@@ -10,16 +10,17 @@ const ch = canvas.height;
 // };
 
 const successCallback = (stream) => {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext);
-    const sourceNode = audioContext.createMediaStreamSource(stream);
-    const analyserNode = audioContext.createAnalyser();
-    const ocillatorNode = audioContext.createOscillator();
-    analyserNode.fftSize = 2048;
-    ocillatorNode.connect(audioContext.destination);
-    ocillatorNode.frequency.value = 440;
     const button = document.getElementById('button');
     button.addEventListener('touchend', () => {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext);
+        const sourceNode = audioContext.createMediaStreamSource(stream);
+        const analyserNode = audioContext.createAnalyser();
+        const ocillatorNode = audioContext.createOscillator();
+        analyserNode.fftSize = 2048;
+        //ocillatorNode.connect(sourceNode);
+        ocillatorNode.frequency.value = 440;
         console.log('touched');
+        ocillatorNode.start();
         sourceNode.connect(audioContext.destination);
     });
     
