@@ -17,10 +17,10 @@ const successCallback = (stream) => {
     analyserNode.fftSize = 2048;
     ocillatorNode.connect(audioContext.destination);
     ocillatorNode.frequency.value = 440;
-    window.addEventListener('touchend', () => {
-        ocillatorNode.start();
+    const button = document.getElementById('button');
+    button.addEventListener('touchend', () => {
         console.log('touched');
-        
+        ocillatorNode.start();
     });
 };
 
