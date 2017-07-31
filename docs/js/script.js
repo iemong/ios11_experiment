@@ -2638,11 +2638,10 @@ function init(stream) {
     var audioContext = new _SupportedAudioContext2.default();
     var sourceNode = audioContext.createMediaStreamSource(stream);
 
-    (0, _micWave2.default)(stream, audioContext, sourceNode);
+    //micWave(stream, audioContext, sourceNode);
 
     var micRecording = new _MicRecording2.default({
         type: _locationParams2.default.type ? 'audio/' + _locationParams2.default.type : null,
-        audioCtx: audioContext,
         source: sourceNode
     });
 

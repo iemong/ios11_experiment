@@ -35,11 +35,10 @@ function init (stream) {
     const sourceNode = audioContext.createMediaStreamSource(stream);
 
     
-    micWave(stream, audioContext, sourceNode);
+    //micWave(stream, audioContext, sourceNode);
 
     const micRecording = new MicRecording({
         type: locationParams.type ? `audio/${locationParams.type}` : null,
-        audioCtx: audioContext,
         source: sourceNode
     });
     
