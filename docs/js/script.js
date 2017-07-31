@@ -2381,78 +2381,7 @@ var MicRecording = function (_EventEmitter) {
 exports.default = MicRecording;
 ;
 
-},{"./SupportedAudioContext":109,"./recorderjs":114,"babel-runtime/core-js/object/get-prototype-of":3,"babel-runtime/core-js/promise":5,"babel-runtime/helpers/classCallCheck":8,"babel-runtime/helpers/createClass":9,"babel-runtime/helpers/inherits":10,"babel-runtime/helpers/possibleConstructorReturn":11,"events":103}],108:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = require('babel-runtime/helpers/createClass');
-
-var _createClass3 = _interopRequireDefault(_createClass2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var canvas = document.querySelector('.js-sound-wave');
-var drawContext = canvas.getContext('2d');
-var cw = canvas.width;
-var ch = canvas.height;
-
-var MicWaves = function () {
-    function MicWaves() {
-        var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-        (0, _classCallCheck3.default)(this, MicWaves);
-
-        this._stream = opts.stream;
-        this._audioContext = opts.audioContext;
-        this._sourceNode = opts.sourceNode;
-        this._analyserNode = null;
-        this._init();
-    }
-
-    (0, _createClass3.default)(MicWaves, [{
-        key: '_init',
-        value: function _init() {
-            this._analyserNode = this._audioContext.createAnalyser();
-            this._analyserNode.fftSize = 1024;
-            this._sourceNode.connect(this._analyserNode);
-        }
-    }, {
-        key: 'draw',
-        value: function draw() {
-            var _this = this;
-
-            var barWidth = cw / this._analyserNode.fftSize;
-            var array = new Uint8Array(this._analyserNode.fftSize);
-            this._analyserNode.getByteTimeDomainData(array);
-            drawContext.fillStyle = 'rgba(0, 0, 0, 1)';
-            drawContext.fillRect(0, 0, cw, ch);
-
-            for (var i = 0; i < this._analyserNode.fftSize; i++) {
-                var value = array[i];
-                var percent = value / 255;
-                var height = canvas.height * percent;
-                var offset = canvas.height - height;
-
-                drawContext.fillStyle = 'lime';
-                drawContext.fillRect(i * barWidth, offset, barWidth, 2);
-            }
-            window.requestAnimationFrame(function () {
-                _this.draw();
-            });
-        }
-    }]);
-    return MicWaves;
-}();
-
-exports.default = MicWaves;
-
-},{"babel-runtime/helpers/classCallCheck":8,"babel-runtime/helpers/createClass":9}],109:[function(require,module,exports){
+},{"./SupportedAudioContext":108,"./recorderjs":114,"babel-runtime/core-js/object/get-prototype-of":3,"babel-runtime/core-js/promise":5,"babel-runtime/helpers/classCallCheck":8,"babel-runtime/helpers/createClass":9,"babel-runtime/helpers/inherits":10,"babel-runtime/helpers/possibleConstructorReturn":11,"events":103}],108:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2460,7 +2389,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = window.AudioContext || window.webkitAudioContext;
 
-},{}],110:[function(require,module,exports){
+},{}],109:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2479,7 +2408,7 @@ var disableButton = exports.disableButton = function disableButton() {
     recorderButton.style.opacity = 0.5;
 };
 
-},{}],111:[function(require,module,exports){
+},{}],110:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2506,7 +2435,7 @@ function createAudioElement(url) {
     li.appendChild(downloadLink);
 }
 
-},{}],112:[function(require,module,exports){
+},{}],111:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2517,7 +2446,7 @@ var userAgent = navigator.userAgent;
 var isSP = userAgent.indexOf('iPhone') >= 0 || userAgent.indexOf('iPad') >= 0 || userAgent.indexOf('Android') >= 0;
 exports.default = isSP;
 
-},{}],113:[function(require,module,exports){
+},{}],112:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2533,7 +2462,45 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var locationParams = _querystring2.default.parse((location.search || '').replace(/^\?/, ''));
 exports.default = locationParams;
 
-},{"querystring":106}],114:[function(require,module,exports){
+},{"querystring":106}],113:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.default = micWave;
+var canvas = document.querySelector('.js-sound-wave');
+var drawContext = canvas.getContext('2d');
+var cw = canvas.width;
+var ch = canvas.height;
+
+function micWave(stream, audioContext, sourceNode) {
+    var analyserNode = audioContext.createAnalyser();
+    analyserNode.fftSize = 1024;
+    sourceNode.connect(analyserNode);
+
+    var draw = function draw() {
+        var barWidth = canvas.width / analyserNode.fftSize;
+        var array = new Uint8Array(analyserNode.fftSize);
+        analyserNode.getByteTimeDomainData(array);
+        drawContext.fillStyle = 'rgba(0, 0, 0, 1)';
+        drawContext.fillRect(0, 0, cw, ch);
+
+        for (var i = 0; i < analyserNode.fftSize; ++i) {
+            var value = array[i];
+            var percent = value / 255;
+            var height = canvas.height * percent;
+            var offset = canvas.height - height;
+
+            drawContext.fillStyle = 'lime';
+            drawContext.fillRect(i * barWidth, offset, barWidth, 2);
+        }
+        requestAnimationFrame(draw);
+    };
+    draw();
+}
+
+},{}],114:[function(require,module,exports){
 'use strict';
 
 var WORKER_PATH = './recorderWorker.js';
@@ -2667,9 +2634,9 @@ var _device = require('./lib/device');
 
 var _device2 = _interopRequireDefault(_device);
 
-var _MicWaves = require('./lib/MicWaves');
+var _micWave = require('./lib/micWave');
 
-var _MicWaves2 = _interopRequireDefault(_MicWaves);
+var _micWave2 = _interopRequireDefault(_micWave);
 
 var _MicRecording = require('./lib/MicRecording');
 
@@ -2695,35 +2662,25 @@ var medias = { audio: true, video: false };
 var initializeButton = document.querySelector('.js-microphone-button');
 var recorderButton = document.querySelector('.js-recorder-button');
 var recordedSetup = document.querySelector('.js-recorded-setup');
-var audioBlob = null;
 
 var successCallback = function successCallback(stream) {
-    var audioContext = new _SupportedAudioContext2.default();
-    var sourceNode = audioContext.createMediaStreamSource(stream);
     if (_device2.default) {
         initializeButton.addEventListener('touchend', function () {
-            init(stream, audioContext, sourceNode);
+            init(stream);
             initializeButton.style.pointerEvents = 'none';
             initializeButton.style.opacity = 0.5;
         });
     } else {
         initializeButton.addEventListener('click', function () {
-            init(stream, audioContext, sourceNode);
+            init(stream);
             initializeButton.style.pointerEvents = 'none';
             initializeButton.style.opacity = 0.5;
         });
         recordedSetup.addEventListener('click', function () {
-            var fileReader = new FileReader();
-            fileReader.addEventListener('load', function () {
-                console.log(audioBlob);
-                console.log(fileReader.result);
-                audioContext.decodeAudioData(fileReader.result, function () {
-                    var recodedSource = audioContext.createBufferSource();
-                    recodedSource.connect(audioContext.destination);
-                    recodedSource.start();
-                });
-            });
-            fileReader.readAsArrayBuffer(audioBlob);
+            var sound = document.querySelector('js-recorded-sound');
+            console.log(sound.src);
+
+            //fetch().then
         });
     }
 };
@@ -2734,18 +2691,15 @@ var errorCallback = function errorCallback(err) {
 
 navigator.mediaDevices.getUserMedia(medias).then(successCallback).catch(errorCallback);
 
-function init(stream, audioContext, sourceNode) {
+function init(stream) {
+    var audioContext = new _SupportedAudioContext2.default();
+    var sourceNode = audioContext.createMediaStreamSource(stream);
     var micRecording = new _MicRecording2.default({
         type: _locationParams2.default.type ? 'audio/' + _locationParams2.default.type : null,
         source: sourceNode
     });
     // マイクの音をそのまま波形で出す
-    var micWaves = new _MicWaves2.default({
-        stream: stream,
-        audioContext: audioContext,
-        sourceNode: sourceNode
-    });
-    micWaves.draw();
+    (0, _micWave2.default)(stream, audioContext, sourceNode);
 
     (0, _buttonState.enableButton)();
     recorderButton.addEventListener('click', function () {
@@ -2767,11 +2721,9 @@ function init(stream, audioContext, sourceNode) {
             }).then(function (blob) {
                 (0, _createAudioElement2.default)((window.URL || window.webkitURL).createObjectURL(blob));
                 (0, _buttonState.enableButton)();
-                // blobを吐き出す
-                audioBlob = blob;
             });
         }
     }
 }
 
-},{"./lib/MicRecording":107,"./lib/MicWaves":108,"./lib/SupportedAudioContext":109,"./lib/buttonState":110,"./lib/createAudioElement":111,"./lib/device":112,"./lib/locationParams":113,"babel-runtime/core-js/promise":5}]},{},[115]);
+},{"./lib/MicRecording":107,"./lib/SupportedAudioContext":108,"./lib/buttonState":109,"./lib/createAudioElement":110,"./lib/device":111,"./lib/locationParams":112,"./lib/micWave":113,"babel-runtime/core-js/promise":5}]},{},[115]);

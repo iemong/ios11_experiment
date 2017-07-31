@@ -1,5 +1,5 @@
 import isSP from './lib/device';
-import MicWaves from './lib/MicWaves';
+import micWave from './lib/micWave';
 import MicRecording from './lib/MicRecording';
 import locationParams from './lib/locationParams';
 import SupportedAudioContext from './lib/SupportedAudioContext';
@@ -10,35 +10,25 @@ const medias = {audio : true, video : false};
 const initializeButton = document.querySelector('.js-microphone-button');
 const recorderButton = document.querySelector('.js-recorder-button');
 const recordedSetup = document.querySelector('.js-recorded-setup');
-let audioBlob = null;
 
 const successCallback = (stream) => {
-    const audioContext = new SupportedAudioContext();
-    const sourceNode = audioContext.createMediaStreamSource(stream);
     if(isSP) {
         initializeButton.addEventListener('touchend', () => {
-            init(stream, audioContext, sourceNode);
+            init(stream);
             initializeButton.style.pointerEvents = 'none';
             initializeButton.style.opacity = 0.5;
         });
     } else {
         initializeButton.addEventListener('click', () => {
-            init(stream, audioContext, sourceNode);
+            init(stream);
             initializeButton.style.pointerEvents = 'none';
             initializeButton.style.opacity = 0.5;
         });
         recordedSetup.addEventListener('click', () => {
-            const fileReader = new FileReader();
-            fileReader.addEventListener('load', () => {
-                console.log(audioBlob);
-                console.log(fileReader.result);
-                audioContext.decodeAudioData(fileReader.result, function() {
-                    const recodedSource = audioContext.createBufferSource();
-                    recodedSource.connect(audioContext.destination);
-                    recodedSource.start();
-                });
-            });
-            fileReader.readAsArrayBuffer(audioBlob);
+            const sound = document.querySelector('js-recorded-sound');
+            console.log(sound.src);
+            
+            //fetch().then
         });
     }
 };
@@ -51,18 +41,16 @@ navigator.mediaDevices.getUserMedia(medias)
     .then(successCallback)
     .catch(errorCallback);
 
-function init (stream, audioContext, sourceNode) {
+
+function init (stream) {
+    const audioContext = new SupportedAudioContext();
+    const sourceNode = audioContext.createMediaStreamSource(stream);
     const micRecording = new MicRecording({
         type: locationParams.type ? `audio/${locationParams.type}` : null,
         source: sourceNode
     });
     // マイクの音をそのまま波形で出す
-    const micWaves = new MicWaves({
-        stream: stream,
-        audioContext: audioContext,
-        sourceNode: sourceNode
-    });
-    micWaves.draw();
+    micWave(stream, audioContext, sourceNode);
 
     enableButton();
     recorderButton.addEventListener('click', () => {
@@ -86,8 +74,6 @@ function init (stream, audioContext, sourceNode) {
                     (window.URL || window.webkitURL).createObjectURL(blob)
                 );
                 enableButton();
-                // blobを吐き出す
-                audioBlob = blob;
             });
         }
     }
