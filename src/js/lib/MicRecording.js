@@ -8,19 +8,26 @@ export default class MicRecording extends EventEmitter {
         this.type = opts.type || 'audio/wav';
     }
 
-    start (stream) {
+    start () {
         return new Promise((resolve, reject) => {
-            const audioContext = new SupportedAudioContext();
-            const input = audioContext.createMediaStreamSource(stream);
-            // TODO: lowpass filter噛ませたほうがいい
-            
-            const rec = new Recorder(input, {
-                sampleRate: 16000,
-                scale: 1
+            navigator.getUserMedia({
+                video: false,
+                audio: true
+            }, (stream) => {
+                const audioContext = new SupportedAudioContext();
+                const input = audioContext.createMediaStreamSource(stream);
+                // TODO: lowpass filter噛ませたほうがいい
+                
+                const rec = new Recorder(input, {
+                    sampleRate: 16000,
+                    scale: 2
+                });
+                rec.record();
+                this.rec = rec;
+                resolve();
+            }, (err) => {
+                reject(new Error('fail in recording.'));
             });
-            rec.record();
-            this.rec = rec;
-            resolve();
         });
     }
 

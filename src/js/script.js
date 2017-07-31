@@ -12,11 +12,14 @@ const successCallback = (stream) => {
     const button = document.querySelector('.js-microphone-button');
     if(isSP) {
         button.addEventListener('touchend', () => {
-            init(stream);
+            //init(stream);
+            const audioContext = new SupportedAudioContext();
+            const sourceNode = audioContext.createMediaStreamSource(stream);
+            micWave(stream, audioContext, sourceNode);
         });
     } else {
         button.addEventListener('click', () => {
-            init(stream);
+            //init(stream);
         });
     }
 };
@@ -31,11 +34,10 @@ navigator.mediaDevices.getUserMedia(medias)
 
 
 function init (stream) {
-    // const audioContext = new SupportedAudioContext();
-    // const sourceNode = audioContext.createMediaStreamSource(stream);
+    const audioContext = new SupportedAudioContext();
+    const sourceNode = audioContext.createMediaStreamSource(stream);
 
-    
-    //micWave(stream, audioContext, sourceNode);
+    micWave(stream, audioContext, sourceNode);
 
     const micRecording = new MicRecording({
         type: locationParams.type ? `audio/${locationParams.type}` : null
@@ -44,7 +46,7 @@ function init (stream) {
     recorderButton.addEventListener('click', () => {
         if (!micRecording.rec) {
             disableButton();
-            micRecording.start(stream).then(() => {
+            micRecording.start().then(() => {
                 enableButton(true);
             });
         } else {

@@ -2338,21 +2338,28 @@ var MicRecording = function (_EventEmitter) {
 
     (0, _createClass3.default)(MicRecording, [{
         key: 'start',
-        value: function start(stream) {
+        value: function start() {
             var _this2 = this;
 
             return new _promise2.default(function (resolve, reject) {
-                var audioContext = new _SupportedAudioContext2.default();
-                var input = audioContext.createMediaStreamSource(stream);
-                // TODO: lowpass filter噛ませたほうがいい
+                navigator.getUserMedia({
+                    video: false,
+                    audio: true
+                }, function (stream) {
+                    var audioContext = new _SupportedAudioContext2.default();
+                    var input = audioContext.createMediaStreamSource(stream);
+                    // TODO: lowpass filter噛ませたほうがいい
 
-                var rec = new _recorderjs2.default(input, {
-                    sampleRate: 16000,
-                    scale: 1
+                    var rec = new _recorderjs2.default(input, {
+                        sampleRate: 16000,
+                        scale: 2
+                    });
+                    rec.record();
+                    _this2.rec = rec;
+                    resolve();
+                }, function (err) {
+                    reject(new Error('fail in recording.'));
                 });
-                rec.record();
-                _this2.rec = rec;
-                resolve();
             });
         }
     }, {
@@ -2615,11 +2622,14 @@ var successCallback = function successCallback(stream) {
     var button = document.querySelector('.js-microphone-button');
     if (_device2.default) {
         button.addEventListener('touchend', function () {
-            init(stream);
+            //init(stream);
+            var audioContext = new _SupportedAudioContext2.default();
+            var sourceNode = audioContext.createMediaStreamSource(stream);
+            (0, _micWave2.default)(stream, audioContext, sourceNode);
         });
     } else {
         button.addEventListener('click', function () {
-            init(stream);
+            //init(stream);
         });
     }
 };
@@ -2631,11 +2641,10 @@ var errorCallback = function errorCallback(err) {
 navigator.mediaDevices.getUserMedia(medias).then(successCallback).catch(errorCallback);
 
 function init(stream) {
-    // const audioContext = new SupportedAudioContext();
-    // const sourceNode = audioContext.createMediaStreamSource(stream);
+    var audioContext = new _SupportedAudioContext2.default();
+    var sourceNode = audioContext.createMediaStreamSource(stream);
 
-
-    //micWave(stream, audioContext, sourceNode);
+    (0, _micWave2.default)(stream, audioContext, sourceNode);
 
     var micRecording = new _MicRecording2.default({
         type: _locationParams2.default.type ? 'audio/' + _locationParams2.default.type : null
@@ -2644,7 +2653,7 @@ function init(stream) {
     recorderButton.addEventListener('click', function () {
         if (!micRecording.rec) {
             disableButton();
-            micRecording.start(stream).then(function () {
+            micRecording.start().then(function () {
                 enableButton(true);
             });
         } else {
