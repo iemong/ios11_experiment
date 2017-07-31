@@ -2712,11 +2712,19 @@ var successCallback = function successCallback(stream) {
             initializeButton.style.pointerEvents = 'none';
             initializeButton.style.opacity = 0.5;
         });
-        // recordedSetup.addEventListener('click', () => {
-        //     const recodedSource = audioContext.createBufferSource();
-        //     recodedSource.connect(audioContext.destination);
-        //     recodedSource.start();
-        // });
+        recordedSetup.addEventListener('click', function () {
+            var fileReader = new FileReader();
+            fileReader.addEventListener('load', function () {
+                console.log(audioBlob);
+                console.log(fileReader.result);
+                audioContext.decodeAudioData(fileReader.result, function () {
+                    var recodedSource = audioContext.createBufferSource();
+                    recodedSource.connect(audioContext.destination);
+                    recodedSource.start();
+                });
+            });
+            fileReader.readAsArrayBuffer(audioBlob);
+        });
     }
 };
 
@@ -2740,16 +2748,12 @@ function init(stream, audioContext, sourceNode) {
     micWaves.draw();
 
     (0, _buttonState.enableButton)();
-    if (_device2.default) {
-        recorderButton.addEventListener('touchend', function () {
-            recordFunc();
-        });
-    } else {
-        recorderButton.addEventListener('click', function () {
-            recordFunc();
-        });
-    }
-
+    recorderButton.addEventListener('click', function () {
+        recordFunc();
+    });
+    recorderButton.addEventListener('touchend', function () {
+        recordFunc();
+    });
     function recordFunc() {
         if (!micRecording.rec) {
             (0, _buttonState.disableButton)();
