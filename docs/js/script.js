@@ -2364,6 +2364,8 @@ var MicRecording = function (_EventEmitter) {
                 var rec = _this3.rec;
                 if (!rec) {
                     reject();
+                    console.log("ここ？");
+
                     return;
                 }
 

@@ -29,6 +29,8 @@ export default class MicRecording extends EventEmitter {
             const rec = this.rec;
             if (!rec) {
                 reject();
+                console.log("ここ？");
+                
                 return;
             }
             
