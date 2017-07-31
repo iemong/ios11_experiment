@@ -2364,8 +2364,6 @@ var MicRecording = function (_EventEmitter) {
                 var rec = _this3.rec;
                 if (!rec) {
                     reject();
-                    console.log("ここ？");
-
                     return;
                 }
 
@@ -2373,6 +2371,8 @@ var MicRecording = function (_EventEmitter) {
 
                 rec.exportWAV(function (blob) {
                     _this3.rec = null;
+                    console.log(blob);
+
                     resolve(blob);
                 }, _this3.type);
             });

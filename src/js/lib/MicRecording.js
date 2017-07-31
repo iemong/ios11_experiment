@@ -29,8 +29,6 @@ export default class MicRecording extends EventEmitter {
             const rec = this.rec;
             if (!rec) {
                 reject();
-                console.log("ここ？");
-                
                 return;
             }
             
@@ -38,6 +36,8 @@ export default class MicRecording extends EventEmitter {
 
             rec.exportWAV((blob) => {
                 this.rec = null;
+                console.log(blob);
+                
                 resolve(blob);
             }, this.type);
         });
