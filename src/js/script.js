@@ -27,19 +27,11 @@ const successCallback = (stream) => {
             initializeButton.style.pointerEvents = 'none';
             initializeButton.style.opacity = 0.5;
         });
-        recordedSetup.addEventListener('click', () => {
-            const fileReader = new FileReader();
-            fileReader.addEventListener('load', () => {
-                console.log(audioBlob);
-                console.log(fileReader.result);
-                audioContext.decodeAudioData(fileReader.result, function() {
-                    const recodedSource = audioContext.createBufferSource();
-                    recodedSource.connect(audioContext.destination);
-                    recodedSource.start();
-                });
-            });
-            fileReader.readAsArrayBuffer(audioBlob);
-        });
+        // recordedSetup.addEventListener('click', () => {
+        //     const recodedSource = audioContext.createBufferSource();
+        //     recodedSource.connect(audioContext.destination);
+        //     recodedSource.start();
+        // });
     }
 };
 
@@ -65,12 +57,16 @@ function init (stream, audioContext, sourceNode) {
     micWaves.draw();
 
     enableButton();
-    recorderButton.addEventListener('click', () => {
-        recordFunc();
-    });
-    recorderButton.addEventListener('touchend', () => {
-        recordFunc();
-    });
+    if(isSP) {
+        recorderButton.addEventListener('touchend', () => {
+            recordFunc();
+        });
+    } else {
+        recorderButton.addEventListener('click', () => {
+            recordFunc();
+        });
+    }
+    
     function recordFunc () {
         if (!micRecording.rec) {
             disableButton();
