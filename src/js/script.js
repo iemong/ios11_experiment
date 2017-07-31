@@ -31,21 +31,20 @@ navigator.mediaDevices.getUserMedia(medias)
 
 
 function init (stream) {
-    const audioContext = new SupportedAudioContext();
-    const sourceNode = audioContext.createMediaStreamSource(stream);
+    // const audioContext = new SupportedAudioContext();
+    // const sourceNode = audioContext.createMediaStreamSource(stream);
 
     
     //micWave(stream, audioContext, sourceNode);
 
     const micRecording = new MicRecording({
-        type: locationParams.type ? `audio/${locationParams.type}` : null,
-        source: sourceNode
+        type: locationParams.type ? `audio/${locationParams.type}` : null
     });
     
     recorderButton.addEventListener('click', () => {
         if (!micRecording.rec) {
             disableButton();
-            micRecording.start().then(() => {
+            micRecording.start(stream).then(() => {
                 enableButton(true);
             });
         } else {

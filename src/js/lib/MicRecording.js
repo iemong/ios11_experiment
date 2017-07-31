@@ -6,21 +6,19 @@ export default class MicRecording extends EventEmitter {
     constructor (opts = {}) {
         super();
         this.type = opts.type || 'audio/wav';
-        this.sourceNode = opts.source;
     }
 
-    start () {
+    start (stream) {
         return new Promise((resolve, reject) => {
-            
-            const input = this.sourceNode;
+            const audioContext = new SupportedAudioContext();
+            const input = audioContext.createMediaStreamSource(stream);
+            // TODO: lowpass filter噛ませたほうがいい
             
             const rec = new Recorder(input, {
                 sampleRate: 16000,
                 scale: 1
             });
             rec.record();
-            console.log("record開始");
-            
             this.rec = rec;
             resolve();
         });
@@ -38,8 +36,6 @@ export default class MicRecording extends EventEmitter {
 
             rec.exportWAV((blob) => {
                 this.rec = null;
-                console.log(blob);
-                
                 resolve(blob);
             }, this.type);
         });

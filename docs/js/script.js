@@ -2333,26 +2333,24 @@ var MicRecording = function (_EventEmitter) {
         var _this = (0, _possibleConstructorReturn3.default)(this, (MicRecording.__proto__ || (0, _getPrototypeOf2.default)(MicRecording)).call(this));
 
         _this.type = opts.type || 'audio/wav';
-        _this.sourceNode = opts.source;
         return _this;
     }
 
     (0, _createClass3.default)(MicRecording, [{
         key: 'start',
-        value: function start() {
+        value: function start(stream) {
             var _this2 = this;
 
             return new _promise2.default(function (resolve, reject) {
-
-                var input = _this2.sourceNode;
+                var audioContext = new _SupportedAudioContext2.default();
+                var input = audioContext.createMediaStreamSource(stream);
+                // TODO: lowpass filter噛ませたほうがいい
 
                 var rec = new _recorderjs2.default(input, {
                     sampleRate: 16000,
                     scale: 1
                 });
                 rec.record();
-                console.log("record開始");
-
                 _this2.rec = rec;
                 resolve();
             });
@@ -2373,8 +2371,6 @@ var MicRecording = function (_EventEmitter) {
 
                 rec.exportWAV(function (blob) {
                     _this3.rec = null;
-                    console.log(blob);
-
                     resolve(blob);
                 }, _this3.type);
             });
@@ -2635,20 +2631,20 @@ var errorCallback = function errorCallback(err) {
 navigator.mediaDevices.getUserMedia(medias).then(successCallback).catch(errorCallback);
 
 function init(stream) {
-    var audioContext = new _SupportedAudioContext2.default();
-    var sourceNode = audioContext.createMediaStreamSource(stream);
+    // const audioContext = new SupportedAudioContext();
+    // const sourceNode = audioContext.createMediaStreamSource(stream);
+
 
     //micWave(stream, audioContext, sourceNode);
 
     var micRecording = new _MicRecording2.default({
-        type: _locationParams2.default.type ? 'audio/' + _locationParams2.default.type : null,
-        source: sourceNode
+        type: _locationParams2.default.type ? 'audio/' + _locationParams2.default.type : null
     });
 
     recorderButton.addEventListener('click', function () {
         if (!micRecording.rec) {
             disableButton();
-            micRecording.start().then(function () {
+            micRecording.start(stream).then(function () {
                 enableButton(true);
             });
         } else {
