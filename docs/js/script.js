@@ -2623,7 +2623,7 @@ var button = document.querySelector('.js-microphone-button');
 var successCallback = function successCallback(stream) {
     if (_device2.default) {
         button.addEventListener('touchend', function () {
-            //init(stream);
+            init(stream);
         });
     } else {
         button.addEventListener('click', function () {

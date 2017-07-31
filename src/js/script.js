@@ -12,7 +12,7 @@ const button = document.querySelector('.js-microphone-button');
 const successCallback = (stream) => {
     if(isSP) {
         button.addEventListener('touchend', () => {
-            //init(stream);
+            init(stream);
         });
     } else {
         button.addEventListener('click', () => {
