@@ -12,32 +12,34 @@ const recorderButton = document.querySelector('.js-recorder-button');
 const recordedSetup = document.querySelector('.js-recorded-setup');
 
 const successCallback = (stream) => {
-    init(stream);
-    initializeButton.style.pointerEvents = 'none';
-    initializeButton.style.opacity = 0.5;
-    recordedSetup.addEventListener('cick', () => {
-        const sound = document.querySelector('js-recorded-sound');
-        console.log(sound.src);
-        
-        //fetch().then
-    });
+    if(isSP) {
+        initializeButton.addEventListener('touchend', () => {
+            init(stream);
+            initializeButton.style.pointerEvents = 'none';
+            initializeButton.style.opacity = 0.5;
+        });
+    } else {
+        initializeButton.addEventListener('click', () => {
+            init(stream);
+            initializeButton.style.pointerEvents = 'none';
+            initializeButton.style.opacity = 0.5;
+        });
+        recordedSetup.addEventListener('click', () => {
+            const sound = document.querySelector('js-recorded-sound');
+            console.log(sound.src);
+            
+            //fetch().then
+        });
+    }
 };
 
-initializeButton.addEventListener('click', () => {
-    navigator.mediaDevices.getUserMedia(medias)
-        .then(successCallback)
-        .catch(errorCallback);
-});
-initializeButton.addEventListener('touchend', () => {
-    navigator.mediaDevices.getUserMedia(medias)
-        .then(successCallback)
-        .catch(errorCallback);
-});
 const errorCallback = (err) => {
     new Error(err);
 };
 
-
+navigator.mediaDevices.getUserMedia(medias)
+    .then(successCallback)
+    .catch(errorCallback);
 
 
 function init (stream) {

@@ -2664,26 +2664,32 @@ var recorderButton = document.querySelector('.js-recorder-button');
 var recordedSetup = document.querySelector('.js-recorded-setup');
 
 var successCallback = function successCallback(stream) {
-    init(stream);
-    initializeButton.style.pointerEvents = 'none';
-    initializeButton.style.opacity = 0.5;
-    recordedSetup.addEventListener('cick', function () {
-        var sound = document.querySelector('js-recorded-sound');
-        console.log(sound.src);
+    if (_device2.default) {
+        initializeButton.addEventListener('touchend', function () {
+            init(stream);
+            initializeButton.style.pointerEvents = 'none';
+            initializeButton.style.opacity = 0.5;
+        });
+    } else {
+        initializeButton.addEventListener('click', function () {
+            init(stream);
+            initializeButton.style.pointerEvents = 'none';
+            initializeButton.style.opacity = 0.5;
+        });
+        recordedSetup.addEventListener('click', function () {
+            var sound = document.querySelector('js-recorded-sound');
+            console.log(sound.src);
 
-        //fetch().then
-    });
+            //fetch().then
+        });
+    }
 };
 
-initializeButton.addEventListener('click', function () {
-    navigator.mediaDevices.getUserMedia(medias).then(successCallback).catch(errorCallback);
-});
-initializeButton.addEventListener('touchend', function () {
-    navigator.mediaDevices.getUserMedia(medias).then(successCallback).catch(errorCallback);
-});
 var errorCallback = function errorCallback(err) {
     new Error(err);
 };
+
+navigator.mediaDevices.getUserMedia(medias).then(successCallback).catch(errorCallback);
 
 function init(stream) {
     var audioContext = new _SupportedAudioContext2.default();
