@@ -2381,7 +2381,7 @@ var MicRecording = function (_EventEmitter) {
 exports.default = MicRecording;
 ;
 
-},{"./SupportedAudioContext":108,"./recorderjs":112,"babel-runtime/core-js/object/get-prototype-of":3,"babel-runtime/core-js/promise":5,"babel-runtime/helpers/classCallCheck":8,"babel-runtime/helpers/createClass":9,"babel-runtime/helpers/inherits":10,"babel-runtime/helpers/possibleConstructorReturn":11,"events":103}],108:[function(require,module,exports){
+},{"./SupportedAudioContext":108,"./recorderjs":114,"babel-runtime/core-js/object/get-prototype-of":3,"babel-runtime/core-js/promise":5,"babel-runtime/helpers/classCallCheck":8,"babel-runtime/helpers/createClass":9,"babel-runtime/helpers/inherits":10,"babel-runtime/helpers/possibleConstructorReturn":11,"events":103}],108:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2393,6 +2393,52 @@ exports.default = window.AudioContext || window.webkitAudioContext;
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+var recorderButton = document.querySelector('.js-recorder-button');
+
+var enableButton = exports.enableButton = function enableButton(isPause) {
+    recorderButton.innerHTML = isPause ? '録音停止' : '録音開始';
+    recorderButton.style.pointerEvents = '';
+    recorderButton.style.opacity = '';
+};
+
+var disableButton = exports.disableButton = function disableButton() {
+    recorderButton.style.pointerEvents = 'none';
+    recorderButton.style.opacity = 0.5;
+};
+
+},{}],110:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.default = createAudioElement;
+var listRoot = document.querySelector('.js-list-root');
+
+function createAudioElement(url) {
+    var li = document.createElement('li');
+    listRoot.appendChild(li);
+
+    var audio = new Audio(url);
+    audio.controls = true;
+    audio.classList.add('js-recorded-sound');
+    li.appendChild(audio);
+
+    li.appendChild(document.createElement('br'));
+
+    var downloadLink = document.createElement('a');
+    downloadLink.innerHTML = 'download';
+    downloadLink.href = url;
+    downloadLink.download = 'output.wav';
+    li.appendChild(downloadLink);
+}
+
+},{}],111:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 // UA
@@ -2400,7 +2446,7 @@ var userAgent = navigator.userAgent;
 var isSP = userAgent.indexOf('iPhone') >= 0 || userAgent.indexOf('iPad') >= 0 || userAgent.indexOf('Android') >= 0;
 exports.default = isSP;
 
-},{}],110:[function(require,module,exports){
+},{}],112:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2416,7 +2462,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var locationParams = _querystring2.default.parse((location.search || '').replace(/^\?/, ''));
 exports.default = locationParams;
 
-},{"querystring":106}],111:[function(require,module,exports){
+},{"querystring":106}],113:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2449,13 +2495,12 @@ function micWave(stream, audioContext, sourceNode) {
             drawContext.fillStyle = 'lime';
             drawContext.fillRect(i * barWidth, offset, barWidth, 2);
         }
-
         requestAnimationFrame(draw);
     };
     draw();
 }
 
-},{}],112:[function(require,module,exports){
+},{}],114:[function(require,module,exports){
 'use strict';
 
 var WORKER_PATH = './recorderWorker.js';
@@ -2578,7 +2623,7 @@ Recorder.forceDownload = function (blob, filename) {
 
 module.exports = Recorder;
 
-},{}],113:[function(require,module,exports){
+},{}],115:[function(require,module,exports){
 'use strict';
 
 var _promise = require('babel-runtime/core-js/promise');
@@ -2605,87 +2650,74 @@ var _SupportedAudioContext = require('./lib/SupportedAudioContext');
 
 var _SupportedAudioContext2 = _interopRequireDefault(_SupportedAudioContext);
 
+var _buttonState = require('./lib/buttonState');
+
+var _createAudioElement = require('./lib/createAudioElement');
+
+var _createAudioElement2 = _interopRequireDefault(_createAudioElement);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var medias = { audio: true, video: false };
+var initializeButton = document.querySelector('.js-microphone-button');
 var recorderButton = document.querySelector('.js-recorder-button');
-var listRoot = document.querySelector('.js-list-root');
-var button = document.querySelector('.js-microphone-button');
+var recordedSetup = document.querySelector('.js-recorded-setup');
 
 var successCallback = function successCallback(stream) {
-    if (_device2.default) {
-        button.addEventListener('touchend', function () {
-            init(stream);
-        });
-    } else {
-        button.addEventListener('click', function () {
-            init(stream);
-        });
-    }
+    init(stream);
+    initializeButton.style.pointerEvents = 'none';
+    initializeButton.style.opacity = 0.5;
+    recordedSetup.addEventListener('cick', function () {
+        var sound = document.querySelector('js-recorded-sound');
+        console.log(sound.src);
+
+        //fetch().then
+    });
 };
 
+initializeButton.addEventListener('click', function () {
+    navigator.mediaDevices.getUserMedia(medias).then(successCallback).catch(errorCallback);
+});
+initializeButton.addEventListener('touchend', function () {
+    navigator.mediaDevices.getUserMedia(medias).then(successCallback).catch(errorCallback);
+});
 var errorCallback = function errorCallback(err) {
     new Error(err);
 };
 
-navigator.mediaDevices.getUserMedia(medias).then(successCallback).catch(errorCallback);
-
 function init(stream) {
     var audioContext = new _SupportedAudioContext2.default();
     var sourceNode = audioContext.createMediaStreamSource(stream);
-
-    (0, _micWave2.default)(stream, audioContext, sourceNode);
-
     var micRecording = new _MicRecording2.default({
         type: _locationParams2.default.type ? 'audio/' + _locationParams2.default.type : null,
         source: sourceNode
     });
+    // マイクの音をそのまま波形で出す
+    (0, _micWave2.default)(stream, audioContext, sourceNode);
 
+    (0, _buttonState.enableButton)();
     recorderButton.addEventListener('click', function () {
+        recordFunc();
+    });
+    recorderButton.addEventListener('touchend', function () {
+        recordFunc();
+    });
+    function recordFunc() {
         if (!micRecording.rec) {
-            disableButton();
+            (0, _buttonState.disableButton)();
             micRecording.start().then(function () {
-                enableButton(true);
+                (0, _buttonState.enableButton)(true);
             });
         } else {
-            disableButton();
+            (0, _buttonState.disableButton)();
             _promise2.default.resolve().then(function () {
                 return micRecording.stop();
             }).then(function (blob) {
-                createAudioElement((window.URL || window.webkitURL).createObjectURL(blob));
-                enableButton();
+                (0, _createAudioElement2.default)((window.URL || window.webkitURL).createObjectURL(blob));
+                (0, _buttonState.enableButton)();
             });
         }
-    });
-    enableButton();
+    }
 }
 
-function createAudioElement(url) {
-    var li = document.createElement('li');
-    listRoot.appendChild(li);
-
-    var audio = new Audio(url);
-    audio.controls = true;
-    li.appendChild(audio);
-
-    li.appendChild(document.createElement('br'));
-
-    var downloadLink = document.createElement('a');
-    downloadLink.innerHTML = 'download';
-    downloadLink.href = url;
-    downloadLink.download = 'output.wav';
-    li.appendChild(downloadLink);
-}
-
-function enableButton(isPause) {
-    recorderButton.innerHTML = isPause ? '録音停止' : '録音開始';
-    recorderButton.style.pointerEvents = '';
-    recorderButton.style.opacity = '';
-}
-
-function disableButton() {
-    recorderButton.style.pointerEvents = 'none';
-    recorderButton.style.opacity = 0.5;
-}
-
-},{"./lib/MicRecording":107,"./lib/SupportedAudioContext":108,"./lib/device":109,"./lib/locationParams":110,"./lib/micWave":111,"babel-runtime/core-js/promise":5}]},{},[113]);
+},{"./lib/MicRecording":107,"./lib/SupportedAudioContext":108,"./lib/buttonState":109,"./lib/createAudioElement":110,"./lib/device":111,"./lib/locationParams":112,"./lib/micWave":113,"babel-runtime/core-js/promise":5}]},{},[115]);

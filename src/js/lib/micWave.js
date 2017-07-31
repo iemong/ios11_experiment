@@ -24,7 +24,6 @@ export default function micWave (stream, audioContext, sourceNode){
             drawContext.fillStyle = 'lime';
             drawContext.fillRect(i * barWidth, offset, barWidth, 2);
         }
-
         requestAnimationFrame(draw);
     };
     draw();

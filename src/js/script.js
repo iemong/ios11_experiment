@@ -3,45 +3,61 @@ import micWave from './lib/micWave';
 import MicRecording from './lib/MicRecording';
 import locationParams from './lib/locationParams';
 import SupportedAudioContext from './lib/SupportedAudioContext';
+import { enableButton, disableButton } from './lib/buttonState';
+import createAudioElement from './lib/createAudioElement';
 
 const medias = {audio : true, video : false};
+const initializeButton = document.querySelector('.js-microphone-button');
 const recorderButton = document.querySelector('.js-recorder-button');
-const listRoot = document.querySelector('.js-list-root');
-const button = document.querySelector('.js-microphone-button');
+const recordedSetup = document.querySelector('.js-recorded-setup');
 
 const successCallback = (stream) => {
-    if(isSP) {
-        button.addEventListener('touchend', () => {
-            init(stream);
-        });
-    } else {
-        button.addEventListener('click', () => {
-            init(stream);
-        });
-    }
+    init(stream);
+    initializeButton.style.pointerEvents = 'none';
+    initializeButton.style.opacity = 0.5;
+    recordedSetup.addEventListener('cick', () => {
+        const sound = document.querySelector('js-recorded-sound');
+        console.log(sound.src);
+        
+        //fetch().then
+    });
 };
 
+initializeButton.addEventListener('click', () => {
+    navigator.mediaDevices.getUserMedia(medias)
+        .then(successCallback)
+        .catch(errorCallback);
+});
+initializeButton.addEventListener('touchend', () => {
+    navigator.mediaDevices.getUserMedia(medias)
+        .then(successCallback)
+        .catch(errorCallback);
+});
 const errorCallback = (err) => {
     new Error(err);
 };
 
-navigator.mediaDevices.getUserMedia(medias)
-    .then(successCallback)
-    .catch(errorCallback);
+
 
 
 function init (stream) {
     const audioContext = new SupportedAudioContext();
     const sourceNode = audioContext.createMediaStreamSource(stream);
-
-    micWave(stream, audioContext, sourceNode);
-
     const micRecording = new MicRecording({
         type: locationParams.type ? `audio/${locationParams.type}` : null,
         source: sourceNode
     });
-    
+    // マイクの音をそのまま波形で出す
+    micWave(stream, audioContext, sourceNode);
+
+    enableButton();
     recorderButton.addEventListener('click', () => {
+        recordFunc();
+    });
+    recorderButton.addEventListener('touchend', () => {
+        recordFunc();
+    });
+    function recordFunc () {
         if (!micRecording.rec) {
             disableButton();
             micRecording.start().then(() => {
@@ -58,34 +74,6 @@ function init (stream) {
                 enableButton();
             });
         }
-    });
-    enableButton();
+    }
 }
 
-function createAudioElement (url) {
-    const li = document.createElement('li');
-    listRoot.appendChild(li);
-    
-    const audio = new Audio(url);
-    audio.controls = true;
-    li.appendChild(audio);
-
-    li.appendChild(document.createElement('br'));
-
-    const downloadLink = document.createElement('a');
-    downloadLink.innerHTML = 'download';
-    downloadLink.href = url;
-    downloadLink.download = 'output.wav';
-    li.appendChild(downloadLink);
-}
-
-function enableButton (isPause) {
-    recorderButton.innerHTML = isPause ? '録音停止' : '録音開始';
-    recorderButton.style.pointerEvents = '';
-    recorderButton.style.opacity = '';
-}
-
-function disableButton () {
-    recorderButton.style.pointerEvents = 'none';
-    recorderButton.style.opacity = 0.5;
-}
