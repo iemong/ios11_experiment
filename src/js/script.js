@@ -7,19 +7,23 @@ import SupportedAudioContext from './lib/SupportedAudioContext';
 const medias = {audio : true, video : false};
 const recorderButton = document.querySelector('.js-recorder-button');
 const listRoot = document.querySelector('.js-list-root');
+const button = document.querySelector('.js-microphone-button');
 
 const successCallback = (stream) => {
-    const button = document.querySelector('.js-microphone-button');
     if(isSP) {
         button.addEventListener('touchend', () => {
             //init(stream);
             const audioContext = new SupportedAudioContext();
             const sourceNode = audioContext.createMediaStreamSource(stream);
             micWave(stream, audioContext, sourceNode);
+            
         });
     } else {
         button.addEventListener('click', () => {
             //init(stream);
+            const audioContext = new SupportedAudioContext();
+            const sourceNode = audioContext.createMediaStreamSource(stream);
+            micWave(stream, audioContext, sourceNode);
         });
     }
 };
