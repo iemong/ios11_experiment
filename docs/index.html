@@ -23,12 +23,16 @@
   </head>
   <body>
     <div class="wrapper">
-      <audio id="audio" autoplay></audio>
-      <video id="video" autoplay playsinline></video>
-      <canvas id="canvas"></canvas>
-      <button id="button">ハウル</button>
+      <h1 class="title">TEST : iOS safari record sound from own microphone </h1>
+      <canvas class="js-sound-wave"></canvas>
+      <button class="js-microphone-button">マイク初期化</button>
+      <ul class="list js-list-root">
+        <li class="list__item">
+          <button class="js-recorder-button">loading...</button>
+        </li>
+      </ul>
     </div>
     <!-- javascript-->
-    <script src="./js/script.js?v=35"></script>
+    <script src="./js/script.js?v=36"></script>
   </body>
 </html>

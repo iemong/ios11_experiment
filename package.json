@@ -47,5 +47,8 @@
     "plugins": [
       "transform-runtime"
     ]
+  },
+  "dependencies": {
+    "workerify": "^1.0.0"
   }
 }

@@ -1,4 +1,4 @@
-const canvas = document.querySelector('#canvas');
+const canvas = document.querySelector('.js-sound-wave');
 const drawContext = canvas.getContext('2d');
 const cw = canvas.width;
 const ch = canvas.height;
@@ -30,3 +30,5 @@ export default function micWave (stream){
     };
     draw();
 }
+
+
