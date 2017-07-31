@@ -2,18 +2,21 @@ import isSP from './lib/device';
 import micWave from './lib/micWave';
 import MicRecording from './lib/MicRecording';
 import locationParams from './lib/locationParams';
+import SupportedAudioContext from './lib/SupportedAudioContext';
 
 const medias = {audio : true, video : false};
+const recorderButton = document.querySelector('.js-recorder-button');
+const listRoot = document.querySelector('.js-list-root');
 
 const successCallback = (stream) => {
     const button = document.querySelector('.js-microphone-button');
     if(isSP) {
         button.addEventListener('touchend', () => {
-            micWave(stream);
+            init(stream);
         });
     } else {
         button.addEventListener('click', () => {
-            micWave(stream);
+            init(stream);
         });
     }
 };
@@ -26,13 +29,18 @@ navigator.mediaDevices.getUserMedia(medias)
     .then(successCallback)
     .catch(errorCallback);
 
-// 持ってきたやつ
-const recorderButton = document.querySelector('.js-recorder-button');
-const listRoot = document.querySelector('.js-list-root');
 
-function init () {
+function init (stream) {
+    const audioContext = new SupportedAudioContext();
+    const sourceNode = audioContext.createMediaStreamSource(stream);
+
+    
+    micWave(stream, audioContext, sourceNode);
+
     const micRecording = new MicRecording({
-        type: locationParams.type ? `audio/${locationParams.type}` : null
+        type: locationParams.type ? `audio/${locationParams.type}` : null,
+        audioCtx: audioContext,
+        source: sourceNode
     });
     
     recorderButton.addEventListener('click', () => {
@@ -83,4 +91,3 @@ function disableButton () {
     recorderButton.style.pointerEvents = 'none';
     recorderButton.style.opacity = 0.5;
 }
-init();

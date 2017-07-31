@@ -2333,6 +2333,7 @@ var MicRecording = function (_EventEmitter) {
         var _this = (0, _possibleConstructorReturn3.default)(this, (MicRecording.__proto__ || (0, _getPrototypeOf2.default)(MicRecording)).call(this));
 
         _this.type = opts.type || 'audio/wav';
+        _this.sourceNode = opts.source;
         return _this;
     }
 
@@ -2342,24 +2343,16 @@ var MicRecording = function (_EventEmitter) {
             var _this2 = this;
 
             return new _promise2.default(function (resolve, reject) {
-                navigator.getUserMedia({
-                    video: false,
-                    audio: true
-                }, function (stream) {
-                    var audioContext = new _SupportedAudioContext2.default();
-                    var input = audioContext.createMediaStreamSource(stream);
-                    // TODO: lowpass filter噛ませたほうがいい
 
-                    var rec = new _recorderjs2.default(input, {
-                        sampleRate: 16000,
-                        scale: 1
-                    });
-                    rec.record();
-                    _this2.rec = rec;
-                    resolve();
-                }, function (err) {
-                    reject(new Error('fail in recording.'));
+                var input = _this2.sourceNode;
+
+                var rec = new _recorderjs2.default(input, {
+                    sampleRate: 16000,
+                    scale: 1
                 });
+                rec.record();
+                _this2.rec = rec;
+                resolve();
             });
         }
     }, {
@@ -2436,9 +2429,7 @@ var drawContext = canvas.getContext('2d');
 var cw = canvas.width;
 var ch = canvas.height;
 
-function micWave(stream) {
-    var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    var sourceNode = audioContext.createMediaStreamSource(stream);
+function micWave(stream, audioContext, sourceNode) {
     var analyserNode = audioContext.createAnalyser();
     analyserNode.fftSize = 1024;
     sourceNode.connect(analyserNode);
@@ -2610,19 +2601,25 @@ var _locationParams = require('./lib/locationParams');
 
 var _locationParams2 = _interopRequireDefault(_locationParams);
 
+var _SupportedAudioContext = require('./lib/SupportedAudioContext');
+
+var _SupportedAudioContext2 = _interopRequireDefault(_SupportedAudioContext);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var medias = { audio: true, video: false };
+var recorderButton = document.querySelector('.js-recorder-button');
+var listRoot = document.querySelector('.js-list-root');
 
 var successCallback = function successCallback(stream) {
     var button = document.querySelector('.js-microphone-button');
     if (_device2.default) {
         button.addEventListener('touchend', function () {
-            (0, _micWave2.default)(stream);
+            init(stream);
         });
     } else {
         button.addEventListener('click', function () {
-            (0, _micWave2.default)(stream);
+            init(stream);
         });
     }
 };
@@ -2633,13 +2630,16 @@ var errorCallback = function errorCallback(err) {
 
 navigator.mediaDevices.getUserMedia(medias).then(successCallback).catch(errorCallback);
 
-// 持ってきたやつ
-var recorderButton = document.querySelector('.js-recorder-button');
-var listRoot = document.querySelector('.js-list-root');
+function init(stream) {
+    var audioContext = new _SupportedAudioContext2.default();
+    var sourceNode = audioContext.createMediaStreamSource(stream);
 
-function init() {
+    (0, _micWave2.default)(stream, audioContext, sourceNode);
+
     var micRecording = new _MicRecording2.default({
-        type: _locationParams2.default.type ? 'audio/' + _locationParams2.default.type : null
+        type: _locationParams2.default.type ? 'audio/' + _locationParams2.default.type : null,
+        audioCtx: audioContext,
+        source: sourceNode
     });
 
     recorderButton.addEventListener('click', function () {
@@ -2688,6 +2688,5 @@ function disableButton() {
     recorderButton.style.pointerEvents = 'none';
     recorderButton.style.opacity = 0.5;
 }
-init();
 
-},{"./lib/MicRecording":107,"./lib/device":109,"./lib/locationParams":110,"./lib/micWave":111,"babel-runtime/core-js/promise":5}]},{},[113]);
+},{"./lib/MicRecording":107,"./lib/SupportedAudioContext":108,"./lib/device":109,"./lib/locationParams":110,"./lib/micWave":111,"babel-runtime/core-js/promise":5}]},{},[113]);
