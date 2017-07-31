@@ -1,18 +1,27 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-var medias = { audio: true, video: false };
-var audio = document.getElementById('audio');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+// UA
+var userAgent = navigator.userAgent;
+var isSP = userAgent.indexOf('iPhone') >= 0 || userAgent.indexOf('iPad') >= 0 || userAgent.indexOf('Android') >= 0;
+exports.default = isSP;
+
+},{}],2:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.default = micWave;
 var canvas = document.querySelector('#canvas');
 var drawContext = canvas.getContext('2d');
 var cw = canvas.width;
 var ch = canvas.height;
 
-// UA
-var userAgent = navigator.userAgent;
-var isSP = userAgent.indexOf('iPhone') >= 0 || userAgent.indexOf('iPad') >= 0 || userAgent.indexOf('Android') >= 0;
-
-var showRealTimeWave = function showRealTimeWave(stream) {
+function micWave(stream) {
     var audioContext = new (window.AudioContext || window.webkitAudioContext)();
     var sourceNode = audioContext.createMediaStreamSource(stream);
     var analyserNode = audioContext.createAnalyser();
@@ -38,25 +47,40 @@ var showRealTimeWave = function showRealTimeWave(stream) {
         requestAnimationFrame(draw);
     };
     draw();
-};
+}
+
+},{}],3:[function(require,module,exports){
+'use strict';
+
+var _device = require('./lib/device');
+
+var _device2 = _interopRequireDefault(_device);
+
+var _micWave = require('./lib/micWave');
+
+var _micWave2 = _interopRequireDefault(_micWave);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var medias = { audio: true, video: false };
 
 var successCallback = function successCallback(stream) {
     var button = document.getElementById('button');
-    if (isSP) {
+    if (_device2.default) {
         button.addEventListener('touchend', function () {
-            showRealTimeWave(stream);
+            (0, _micWave2.default)(stream);
         });
     } else {
         button.addEventListener('click', function () {
-            showRealTimeWave(stream);
+            (0, _micWave2.default)(stream);
         });
     }
 };
 
 var errorCallback = function errorCallback(err) {
-    console.log(err);
+    new Error(err);
 };
 
 navigator.mediaDevices.getUserMedia(medias).then(successCallback).catch(errorCallback);
 
-},{}]},{},[1]);
+},{"./lib/device":1,"./lib/micWave":2}]},{},[3]);
