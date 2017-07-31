@@ -2689,7 +2689,9 @@ function init(stream) {
     (0, _micWave2.default)(stream, audioContext, sourceNode);
 
     var micRecording = new _MicRecording2.default({
-        type: _locationParams2.default.type ? 'audio/' + _locationParams2.default.type : null
+        type: _locationParams2.default.type ? 'audio/' + _locationParams2.default.type : null,
+        audioCtx: audioContext,
+        source: sourceNode
     });
 
     recorderButton.addEventListener('click', function () {

@@ -41,10 +41,13 @@ function init (stream) {
     const audioContext = new SupportedAudioContext();
     const sourceNode = audioContext.createMediaStreamSource(stream);
 
+    
     micWave(stream, audioContext, sourceNode);
 
     const micRecording = new MicRecording({
-        type: locationParams.type ? `audio/${locationParams.type}` : null
+        type: locationParams.type ? `audio/${locationParams.type}` : null,
+        audioCtx: audioContext,
+        source: sourceNode
     });
     
     recorderButton.addEventListener('click', () => {
