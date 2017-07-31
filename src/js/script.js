@@ -13,17 +13,10 @@ const successCallback = (stream) => {
     if(isSP) {
         button.addEventListener('touchend', () => {
             //init(stream);
-            const audioContext = new SupportedAudioContext();
-            const sourceNode = audioContext.createMediaStreamSource(stream);
-            micWave(stream, audioContext, sourceNode);
-            
         });
     } else {
         button.addEventListener('click', () => {
-            //init(stream);
-            const audioContext = new SupportedAudioContext();
-            const sourceNode = audioContext.createMediaStreamSource(stream);
-            micWave(stream, audioContext, sourceNode);
+            init(stream);
         });
     }
 };
@@ -41,7 +34,6 @@ function init (stream) {
     const audioContext = new SupportedAudioContext();
     const sourceNode = audioContext.createMediaStreamSource(stream);
 
-    
     micWave(stream, audioContext, sourceNode);
 
     const micRecording = new MicRecording({

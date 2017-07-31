@@ -2352,7 +2352,7 @@ var MicRecording = function (_EventEmitter) {
 
                     var rec = new _recorderjs2.default(input, {
                         sampleRate: 16000,
-                        scale: 2
+                        scale: 1
                     });
                     rec.record();
                     _this2.rec = rec;
@@ -2431,13 +2431,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.default = micWave;
-
-var _recorderjs = require('./recorderjs');
-
-var _recorderjs2 = _interopRequireDefault(_recorderjs);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 var canvas = document.querySelector('.js-sound-wave');
 var drawContext = canvas.getContext('2d');
 var cw = canvas.width;
@@ -2447,18 +2440,6 @@ function micWave(stream, audioContext, sourceNode) {
     var analyserNode = audioContext.createAnalyser();
     analyserNode.fftSize = 1024;
     sourceNode.connect(analyserNode);
-
-    var rec = new _recorderjs2.default(sourceNode, {
-        sampleRate: 16000,
-        scale: 1
-    });
-    rec.record();
-    setTimeout(function () {
-        rec.stop();
-        rec.exportWAV(function (blob) {
-            createAudioElement((window.URL || window.webkitURL).createObjectURL(blob));
-        }, 'audio/wav');
-    }, 3000);
 
     var draw = function draw() {
         var barWidth = canvas.width / analyserNode.fftSize;
@@ -2482,26 +2463,7 @@ function micWave(stream, audioContext, sourceNode) {
     draw();
 }
 
-var listRoot = document.querySelector('.js-list-root');
-
-function createAudioElement(url) {
-    var li = document.createElement('li');
-    listRoot.appendChild(li);
-
-    var audio = new Audio(url);
-    audio.controls = true;
-    li.appendChild(audio);
-
-    li.appendChild(document.createElement('br'));
-
-    var downloadLink = document.createElement('a');
-    downloadLink.innerHTML = 'download';
-    downloadLink.href = url;
-    downloadLink.download = 'output.wav';
-    li.appendChild(downloadLink);
-}
-
-},{"./recorderjs":112}],112:[function(require,module,exports){
+},{}],112:[function(require,module,exports){
 'use strict';
 
 var WORKER_PATH = './recorderWorker.js';
@@ -2662,16 +2624,10 @@ var successCallback = function successCallback(stream) {
     if (_device2.default) {
         button.addEventListener('touchend', function () {
             //init(stream);
-            var audioContext = new _SupportedAudioContext2.default();
-            var sourceNode = audioContext.createMediaStreamSource(stream);
-            (0, _micWave2.default)(stream, audioContext, sourceNode);
         });
     } else {
         button.addEventListener('click', function () {
-            //init(stream);
-            var audioContext = new _SupportedAudioContext2.default();
-            var sourceNode = audioContext.createMediaStreamSource(stream);
-            (0, _micWave2.default)(stream, audioContext, sourceNode);
+            init(stream);
         });
     }
 };

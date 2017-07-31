@@ -20,7 +20,7 @@ export default class MicRecording extends EventEmitter {
                 
                 const rec = new Recorder(input, {
                     sampleRate: 16000,
-                    scale: 2
+                    scale: 1
                 });
                 rec.record();
                 this.rec = rec;
