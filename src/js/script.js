@@ -54,7 +54,6 @@ function init (stream, audioContext, sourceNode) {
         audioContext: audioContext,
         sourceNode: sourceNode
     });
-    micWaves.draw();
 
     enableButton();
     if(isSP) {
