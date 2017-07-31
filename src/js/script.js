@@ -53,12 +53,17 @@ function init (stream) {
     micWave(stream, audioContext, sourceNode);
 
     enableButton();
-    recorderButton.addEventListener('click', () => {
-        recordFunc();
-    });
-    recorderButton.addEventListener('touchend', () => {
-        recordFunc();
-    });
+    if (isSP) {
+        recorderButton.addEventListener('touchend', () => {
+            recordFunc();
+        });
+    } else {
+        recorderButton.addEventListener('click', () => {
+            recordFunc();
+        });
+    }
+    
+   
     function recordFunc () {
         if (!micRecording.rec) {
             disableButton();

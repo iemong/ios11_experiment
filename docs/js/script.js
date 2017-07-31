@@ -2702,12 +2702,16 @@ function init(stream) {
     (0, _micWave2.default)(stream, audioContext, sourceNode);
 
     (0, _buttonState.enableButton)();
-    recorderButton.addEventListener('click', function () {
-        recordFunc();
-    });
-    recorderButton.addEventListener('touchend', function () {
-        recordFunc();
-    });
+    if (_device2.default) {
+        recorderButton.addEventListener('touchend', function () {
+            recordFunc();
+        });
+    } else {
+        recorderButton.addEventListener('click', function () {
+            recordFunc();
+        });
+    }
+
     function recordFunc() {
         if (!micRecording.rec) {
             (0, _buttonState.disableButton)();
