@@ -2333,6 +2333,7 @@ var MicRecording = function (_EventEmitter) {
         var _this = (0, _possibleConstructorReturn3.default)(this, (MicRecording.__proto__ || (0, _getPrototypeOf2.default)(MicRecording)).call(this));
 
         _this.type = opts.type || 'audio/wav';
+        _this.sourceNode = opts.source;
         return _this;
     }
 
@@ -2342,24 +2343,15 @@ var MicRecording = function (_EventEmitter) {
             var _this2 = this;
 
             return new _promise2.default(function (resolve, reject) {
-                navigator.getUserMedia({
-                    video: false,
-                    audio: true
-                }, function (stream) {
-                    var audioContext = new _SupportedAudioContext2.default();
-                    var input = audioContext.createMediaStreamSource(stream);
-                    // TODO: lowpass filter噛ませたほうがいい
+                var input = _this2.sourceNode;
 
-                    var rec = new _recorderjs2.default(input, {
-                        sampleRate: 16000,
-                        scale: 1
-                    });
-                    rec.record();
-                    _this2.rec = rec;
-                    resolve();
-                }, function (err) {
-                    reject(new Error('fail in recording.'));
+                var rec = new _recorderjs2.default(input, {
+                    sampleRate: 16000,
+                    scale: 1
                 });
+                rec.record();
+                _this2.rec = rec;
+                resolve();
             });
         }
     }, {
@@ -2646,7 +2638,6 @@ function init(stream) {
 
     var micRecording = new _MicRecording2.default({
         type: _locationParams2.default.type ? 'audio/' + _locationParams2.default.type : null,
-        audioCtx: audioContext,
         source: sourceNode
     });
 

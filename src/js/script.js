@@ -38,7 +38,6 @@ function init (stream) {
 
     const micRecording = new MicRecording({
         type: locationParams.type ? `audio/${locationParams.type}` : null,
-        audioCtx: audioContext,
         source: sourceNode
     });
     
