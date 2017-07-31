@@ -8,40 +8,49 @@ var drawContext = canvas.getContext('2d');
 var cw = canvas.width;
 var ch = canvas.height;
 
-// const successCallback = (stream) => {
-//     audio.srcObject = stream;
-// };
+// UA
+var userAgent = navigator.userAgent;
+var isSP = userAgent.indexOf('iPhone') >= 0 || userAgent.indexOf('iPad') >= 0 || userAgent.indexOf('Android') >= 0;
+
+var showRealTimeWave = function showRealTimeWave(stream) {
+    var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    var sourceNode = audioContext.createMediaStreamSource(stream);
+    var analyserNode = audioContext.createAnalyser();
+    analyserNode.fftSize = 1024;
+    sourceNode.connect(analyserNode);
+    var draw = function draw() {
+        var barWidth = canvas.width / analyserNode.fftSize;
+        var array = new Uint8Array(analyserNode.fftSize);
+        analyserNode.getByteTimeDomainData(array);
+        drawContext.fillStyle = 'rgba(0, 0, 0, 1)';
+        drawContext.fillRect(0, 0, cw, ch);
+
+        for (var i = 0; i < analyserNode.fftSize; ++i) {
+            var value = array[i];
+            var percent = value / 255;
+            var height = canvas.height * percent;
+            var offset = canvas.height - height;
+
+            drawContext.fillStyle = 'lime';
+            drawContext.fillRect(i * barWidth, offset, barWidth, 2);
+        }
+
+        requestAnimationFrame(draw);
+    };
+    draw();
+};
 
 var successCallback = function successCallback(stream) {
     var button = document.getElementById('button');
-    button.addEventListener('touchend', function () {
-        var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        var sourceNode = audioContext.createMediaStreamSource(stream);
-        var analyserNode = audioContext.createAnalyser();
-        analyserNode.fftSize = 1024;
-        sourceNode.connect(analyserNode);
-        sourceNode.connect(audioContext.destination);
-        var draw = function draw() {
-            var barWidth = canvas.width / analyserNode.fftSize;
-            var array = new Uint8Array(analyserNode.fftSize);
-            analyserNode.getByteTimeDomainData(array);
-            drawContext.fillStyle = 'rgba(0, 0, 0, 1)';
-            drawContext.fillRect(0, 0, cw, ch);
-
-            for (var i = 0; i < analyserNode.fftSize; ++i) {
-                var value = array[i];
-                var percent = value / 255;
-                var height = canvas.height * percent;
-                var offset = canvas.height - height;
-
-                drawContext.fillStyle = 'lime';
-                drawContext.fillRect(i * barWidth, offset, barWidth, 2);
-            }
-
-            requestAnimationFrame(draw);
-        };
-        draw();
-    });
+    if (isSP) {
+        button.addEventListener('touchend', function () {
+            showRealTimeWave(stream);
+        });
+    } else {
+        button.addEventListener('click', function () {
+            showRealTimeWave(stream);
+        });
+    }
 };
 
 var errorCallback = function errorCallback(err) {
