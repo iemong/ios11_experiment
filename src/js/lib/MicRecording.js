@@ -19,6 +19,8 @@ export default class MicRecording extends EventEmitter {
                 scale: 1
             });
             rec.record();
+            console.log("record開始");
+            
             this.rec = rec;
             resolve();
         });

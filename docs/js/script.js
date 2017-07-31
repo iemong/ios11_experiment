@@ -2351,6 +2351,8 @@ var MicRecording = function (_EventEmitter) {
                     scale: 1
                 });
                 rec.record();
+                console.log("record開始");
+
                 _this2.rec = rec;
                 resolve();
             });
