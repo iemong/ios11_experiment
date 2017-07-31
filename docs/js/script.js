@@ -2413,7 +2413,6 @@ var MicWaves = function () {
         this._sourceNode = opts.sourceNode;
         this._analyserNode = null;
         this._init();
-        this.draw();
     }
 
     (0, _createClass3.default)(MicWaves, [{
@@ -2738,6 +2737,7 @@ function init(stream, audioContext, sourceNode) {
         audioContext: audioContext,
         sourceNode: sourceNode
     });
+    micWaves.draw();
 
     (0, _buttonState.enableButton)();
     if (_device2.default) {

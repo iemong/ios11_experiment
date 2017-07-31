@@ -10,7 +10,6 @@ export default class MicWaves {
         this._sourceNode = opts.sourceNode;
         this._analyserNode = null;
         this._init();
-        this.draw();
     }
     _init() {
         this._analyserNode = this._audioContext.createAnalyser();
