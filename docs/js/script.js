@@ -2334,6 +2334,7 @@ var MicRecording = function (_EventEmitter) {
 
         _this.type = opts.type || 'audio/wav';
         _this.sourceNode = opts.source;
+        _this.recordedBuffers = null;
         return _this;
     }
 
@@ -2344,7 +2345,6 @@ var MicRecording = function (_EventEmitter) {
 
             return new _promise2.default(function (resolve, reject) {
                 var input = _this2.sourceNode;
-
                 var rec = new _recorderjs2.default(input, {
                     sampleRate: 16000,
                     scale: 1
@@ -2365,23 +2365,28 @@ var MicRecording = function (_EventEmitter) {
                     reject();
                     return;
                 }
-
                 rec.stop();
-
                 rec.exportWAV(function (blob) {
                     _this3.rec = null;
+                    rec.getBuffer(function (buffers) {
+                        _this3.recordedBuffers = buffers;
+                    });
                     resolve(blob);
                 }, _this3.type);
             });
+        }
+    }, {
+        key: 'getRecodedBuffers',
+        value: function getRecodedBuffers() {
+            return this.recordedBuffers;
         }
     }]);
     return MicRecording;
 }(_events2.default);
 
 exports.default = MicRecording;
-;
 
-},{"./SupportedAudioContext":108,"./recorderjs":114,"babel-runtime/core-js/object/get-prototype-of":3,"babel-runtime/core-js/promise":5,"babel-runtime/helpers/classCallCheck":8,"babel-runtime/helpers/createClass":9,"babel-runtime/helpers/inherits":10,"babel-runtime/helpers/possibleConstructorReturn":11,"events":103}],108:[function(require,module,exports){
+},{"./SupportedAudioContext":108,"./recorderjs":115,"babel-runtime/core-js/object/get-prototype-of":3,"babel-runtime/core-js/promise":5,"babel-runtime/helpers/classCallCheck":8,"babel-runtime/helpers/createClass":9,"babel-runtime/helpers/inherits":10,"babel-runtime/helpers/possibleConstructorReturn":11,"events":103}],108:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2414,6 +2419,44 @@ var disableButton = exports.disableButton = function disableButton() {
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+
+var _promise = require('babel-runtime/core-js/promise');
+
+var _promise2 = _interopRequireDefault(_promise);
+
+exports.default = controlRecording;
+
+var _buttonState = require('./buttonState');
+
+var _createAudioElement = require('./createAudioElement');
+
+var _createAudioElement2 = _interopRequireDefault(_createAudioElement);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function controlRecording(micRecording) {
+    if (!micRecording.rec) {
+        (0, _buttonState.disableButton)();
+        micRecording.start().then(function () {
+            (0, _buttonState.enableButton)(true);
+        });
+    } else {
+        (0, _buttonState.disableButton)();
+        _promise2.default.resolve().then(function () {
+            return micRecording.stop();
+        }).then(function (blob) {
+            (0, _createAudioElement2.default)((window.URL || window.webkitURL).createObjectURL(blob));
+            (0, _buttonState.enableButton)();
+        });
+    }
+}
+
+},{"./buttonState":109,"./createAudioElement":111,"babel-runtime/core-js/promise":5}],111:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 exports.default = createAudioElement;
 var listRoot = document.querySelector('.js-list-root');
 
@@ -2435,7 +2478,7 @@ function createAudioElement(url) {
     li.appendChild(downloadLink);
 }
 
-},{}],111:[function(require,module,exports){
+},{}],112:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2446,7 +2489,7 @@ var userAgent = navigator.userAgent;
 var isSP = userAgent.indexOf('iPhone') >= 0 || userAgent.indexOf('iPad') >= 0 || userAgent.indexOf('Android') >= 0;
 exports.default = isSP;
 
-},{}],112:[function(require,module,exports){
+},{}],113:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2462,7 +2505,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var locationParams = _querystring2.default.parse((location.search || '').replace(/^\?/, ''));
 exports.default = locationParams;
 
-},{"querystring":106}],113:[function(require,module,exports){
+},{"querystring":106}],114:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2500,7 +2543,7 @@ function micWave(stream, audioContext, sourceNode) {
     draw();
 }
 
-},{}],114:[function(require,module,exports){
+},{}],115:[function(require,module,exports){
 'use strict';
 
 var WORKER_PATH = './recorderWorker.js';
@@ -2623,12 +2666,8 @@ Recorder.forceDownload = function (blob, filename) {
 
 module.exports = Recorder;
 
-},{}],115:[function(require,module,exports){
+},{}],116:[function(require,module,exports){
 'use strict';
-
-var _promise = require('babel-runtime/core-js/promise');
-
-var _promise2 = _interopRequireDefault(_promise);
 
 var _device = require('./lib/device');
 
@@ -2652,9 +2691,9 @@ var _SupportedAudioContext2 = _interopRequireDefault(_SupportedAudioContext);
 
 var _buttonState = require('./lib/buttonState');
 
-var _createAudioElement = require('./lib/createAudioElement');
+var _controlRecording = require('./lib/controlRecording');
 
-var _createAudioElement2 = _interopRequireDefault(_createAudioElement);
+var _controlRecording2 = _interopRequireDefault(_controlRecording);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2676,12 +2715,6 @@ var successCallback = function successCallback(stream) {
             initializeButton.style.pointerEvents = 'none';
             initializeButton.style.opacity = 0.5;
         });
-        recordedSetup.addEventListener('click', function () {
-            var sound = document.querySelector('js-recorded-sound');
-            console.log(sound.src);
-
-            //fetch().then
-        });
     }
 };
 
@@ -2694,6 +2727,7 @@ navigator.mediaDevices.getUserMedia(medias).then(successCallback).catch(errorCal
 function init(stream) {
     var audioContext = new _SupportedAudioContext2.default();
     var sourceNode = audioContext.createMediaStreamSource(stream);
+
     var micRecording = new _MicRecording2.default({
         type: _locationParams2.default.type ? 'audio/' + _locationParams2.default.type : null,
         source: sourceNode
@@ -2704,30 +2738,26 @@ function init(stream) {
     (0, _buttonState.enableButton)();
     if (_device2.default) {
         recorderButton.addEventListener('touchend', function () {
-            recordFunc();
+            (0, _controlRecording2.default)(micRecording);
         });
     } else {
         recorderButton.addEventListener('click', function () {
-            recordFunc();
+            (0, _controlRecording2.default)(micRecording);
         });
     }
+    recordedSetup.addEventListener('click', function () {
+        makeSonudfromBuffer(micRecording.getRecodedBuffers());
+    });
 
-    function recordFunc() {
-        if (!micRecording.rec) {
-            (0, _buttonState.disableButton)();
-            micRecording.start().then(function () {
-                (0, _buttonState.enableButton)(true);
-            });
-        } else {
-            (0, _buttonState.disableButton)();
-            _promise2.default.resolve().then(function () {
-                return micRecording.stop();
-            }).then(function (blob) {
-                (0, _createAudioElement2.default)((window.URL || window.webkitURL).createObjectURL(blob));
-                (0, _buttonState.enableButton)();
-            });
-        }
+    function makeSonudfromBuffer(buffers) {
+        var newSource = audioContext.createBufferSource();
+        var newBuffer = audioContext.createBuffer(2, buffers[0].length, 16000);
+        newBuffer.getChannelData(0).set(buffers[0]);
+        newBuffer.getChannelData(1).set(buffers[1]);
+        newSource.buffer = newBuffer;
+        newSource.connect(audioContext.destination);
+        newSource.start(0);
     }
 }
 
-},{"./lib/MicRecording":107,"./lib/SupportedAudioContext":108,"./lib/buttonState":109,"./lib/createAudioElement":110,"./lib/device":111,"./lib/locationParams":112,"./lib/micWave":113,"babel-runtime/core-js/promise":5}]},{},[115]);
+},{"./lib/MicRecording":107,"./lib/SupportedAudioContext":108,"./lib/buttonState":109,"./lib/controlRecording":110,"./lib/device":112,"./lib/locationParams":113,"./lib/micWave":114}]},{},[116]);
