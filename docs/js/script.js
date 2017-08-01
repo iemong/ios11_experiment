@@ -2386,7 +2386,77 @@ var MicRecording = function (_EventEmitter) {
 
 exports.default = MicRecording;
 
-},{"./SupportedAudioContext":108,"./recorderjs":116,"babel-runtime/core-js/object/get-prototype-of":3,"babel-runtime/core-js/promise":5,"babel-runtime/helpers/classCallCheck":8,"babel-runtime/helpers/createClass":9,"babel-runtime/helpers/inherits":10,"babel-runtime/helpers/possibleConstructorReturn":11,"events":103}],108:[function(require,module,exports){
+},{"./SupportedAudioContext":109,"./recorderjs":117,"babel-runtime/core-js/object/get-prototype-of":3,"babel-runtime/core-js/promise":5,"babel-runtime/helpers/classCallCheck":8,"babel-runtime/helpers/createClass":9,"babel-runtime/helpers/inherits":10,"babel-runtime/helpers/possibleConstructorReturn":11,"events":103}],108:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var MicWaves = function () {
+    function MicWaves() {
+        var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        (0, _classCallCheck3.default)(this, MicWaves);
+
+        this._audioContext = opts.audioContext;
+        this._sourceNode = opts.sourceNode;
+        this._analyserNode = null;
+        this._canvas = document.querySelector('.js-sound-wave');
+        this._drawContext = this._canvas.getContext('2d');
+        this._cw = this._canvas.width;
+        this._ch = this._canvas.height;
+        this._init();
+    }
+
+    (0, _createClass3.default)(MicWaves, [{
+        key: '_init',
+        value: function _init() {
+            this._analyserNode = this._audioContext.createAnalyser();
+            this._analyserNode.fftSize = 1024;
+            this._sourceNode.connect(this._analyserNode);
+            this._draw();
+        }
+    }, {
+        key: '_draw',
+        value: function _draw() {
+            var _this = this;
+
+            var barWidth = this._cw / this._analyserNode.fftSize;
+            var array = new Uint8Array(this._analyserNode.fftSize);
+            this._analyserNode.getByteTimeDomainData(array);
+            this._drawContext.fillStyle = 'rgba(0, 0, 0, 1)';
+            this._drawContext.fillRect(0, 0, this._cw, this._ch);
+
+            for (var i = 0; i < this._analyserNode.fftSize; ++i) {
+                var value = array[i];
+                var percent = value / 255;
+                var height = this._ch * percent;
+                var offset = this._ch - height;
+
+                this._drawContext.fillStyle = 'lime';
+                this._drawContext.fillRect(i * barWidth, offset, barWidth, 2);
+            }
+            requestAnimationFrame(function () {
+                _this._draw();
+            });
+        }
+    }]);
+    return MicWaves;
+}();
+
+exports.default = MicWaves;
+
+},{"babel-runtime/helpers/classCallCheck":8,"babel-runtime/helpers/createClass":9}],109:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2394,7 +2464,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = window.AudioContext || window.webkitAudioContext;
 
-},{}],109:[function(require,module,exports){
+},{}],110:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2413,7 +2483,7 @@ var disableButton = exports.disableButton = function disableButton() {
     recorderButton.style.opacity = 0.5;
 };
 
-},{}],110:[function(require,module,exports){
+},{}],111:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2451,7 +2521,7 @@ function controlRecording(micRecording) {
     }
 }
 
-},{"./buttonState":109,"./createAudioElement":111,"babel-runtime/core-js/promise":5}],111:[function(require,module,exports){
+},{"./buttonState":110,"./createAudioElement":112,"babel-runtime/core-js/promise":5}],112:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2478,7 +2548,7 @@ function createAudioElement(url) {
     li.appendChild(downloadLink);
 }
 
-},{}],112:[function(require,module,exports){
+},{}],113:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2489,7 +2559,7 @@ var userAgent = navigator.userAgent;
 var isSP = userAgent.indexOf('iPhone') >= 0 || userAgent.indexOf('iPad') >= 0 || userAgent.indexOf('Android') >= 0;
 exports.default = isSP;
 
-},{}],113:[function(require,module,exports){
+},{}],114:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2505,7 +2575,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var locationParams = _querystring2.default.parse((location.search || '').replace(/^\?/, ''));
 exports.default = locationParams;
 
-},{"querystring":106}],114:[function(require,module,exports){
+},{"querystring":106}],115:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2522,7 +2592,7 @@ function makeSonudfromBuffer(audioContext, buffers) {
     newSource.start(0);
 }
 
-},{}],115:[function(require,module,exports){
+},{}],116:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2534,7 +2604,7 @@ var drawContext = canvas.getContext('2d');
 var cw = canvas.width;
 var ch = canvas.height;
 
-function micWave(stream, audioContext, sourceNode) {
+function micWave(audioContext, sourceNode) {
     var analyserNode = audioContext.createAnalyser();
     analyserNode.fftSize = 1024;
     sourceNode.connect(analyserNode);
@@ -2560,7 +2630,7 @@ function micWave(stream, audioContext, sourceNode) {
     draw();
 }
 
-},{}],116:[function(require,module,exports){
+},{}],117:[function(require,module,exports){
 'use strict';
 
 var WORKER_PATH = './recorderWorker.js';
@@ -2683,7 +2753,7 @@ Recorder.forceDownload = function (blob, filename) {
 
 module.exports = Recorder;
 
-},{}],117:[function(require,module,exports){
+},{}],118:[function(require,module,exports){
 'use strict';
 
 var _device = require('./lib/device');
@@ -2715,6 +2785,10 @@ var _controlRecording2 = _interopRequireDefault(_controlRecording);
 var _makeSoundFromBuffer = require('./lib/makeSoundFromBuffer');
 
 var _makeSoundFromBuffer2 = _interopRequireDefault(_makeSoundFromBuffer);
+
+var _MicWaves = require('./lib/MicWaves');
+
+var _MicWaves2 = _interopRequireDefault(_MicWaves);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2754,7 +2828,10 @@ function init(stream) {
         source: sourceNode
     });
     // マイクの音をそのまま波形で出す
-    (0, _micWave2.default)(stream, audioContext, sourceNode);
+    var micWaves = new _MicWaves2.default({
+        audioContext: audioContext,
+        sourceNode: sourceNode
+    });
 
     (0, _buttonState.enableButton)();
     if (_device2.default) {
@@ -2781,4 +2858,4 @@ function init(stream) {
     }
 }
 
-},{"./lib/MicRecording":107,"./lib/SupportedAudioContext":108,"./lib/buttonState":109,"./lib/controlRecording":110,"./lib/device":112,"./lib/locationParams":113,"./lib/makeSoundFromBuffer":114,"./lib/micWave":115}]},{},[117]);
+},{"./lib/MicRecording":107,"./lib/MicWaves":108,"./lib/SupportedAudioContext":109,"./lib/buttonState":110,"./lib/controlRecording":111,"./lib/device":113,"./lib/locationParams":114,"./lib/makeSoundFromBuffer":115,"./lib/micWave":116}]},{},[118]);
