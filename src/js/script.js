@@ -4,7 +4,7 @@ import MicRecording from './lib/MicRecording';
 import locationParams from './lib/locationParams';
 import SupportedAudioContext from './lib/SupportedAudioContext';
 import { enableButton, disableButton } from './lib/buttonState';
-import createAudioElement from './lib/createAudioElement';
+import controlRecording from './lib/controlRecording';
 
 const medias = {audio : true, video : false};
 const initializeButton = document.querySelector('.js-microphone-button');
@@ -24,12 +24,6 @@ const successCallback = (stream) => {
             initializeButton.style.pointerEvents = 'none';
             initializeButton.style.opacity = 0.5;
         });
-        recordedSetup.addEventListener('click', () => {
-            const sound = document.querySelector('js-recorded-sound');
-            console.log(sound.src);
-            
-            //fetch().then
-        });
     }
 };
 
@@ -41,10 +35,10 @@ navigator.mediaDevices.getUserMedia(medias)
     .then(successCallback)
     .catch(errorCallback);
 
-
 function init (stream) {
     const audioContext = new SupportedAudioContext();
     const sourceNode = audioContext.createMediaStreamSource(stream);
+
     const micRecording = new MicRecording({
         type: locationParams.type ? `audio/${locationParams.type}` : null,
         source: sourceNode
@@ -55,32 +49,24 @@ function init (stream) {
     enableButton();
     if (isSP) {
         recorderButton.addEventListener('touchend', () => {
-            recordFunc();
+            controlRecording(micRecording);
         });
     } else {
         recorderButton.addEventListener('click', () => {
-            recordFunc();
+            controlRecording(micRecording);
         });
     }
+    recordedSetup.addEventListener('click', () => {
+        makeSonudfromBuffer(micRecording.getRecodedBuffers());
+    });
     
-   
-    function recordFunc () {
-        if (!micRecording.rec) {
-            disableButton();
-            micRecording.start().then(() => {
-                enableButton(true);
-            });
-        } else {
-            disableButton();
-            Promise.resolve().then(() => {
-                return micRecording.stop();
-            }).then((blob) => {
-                createAudioElement(
-                    (window.URL || window.webkitURL).createObjectURL(blob)
-                );
-                enableButton();
-            });
-        }
+    function makeSonudfromBuffer( buffers ) {
+        const newSource = audioContext.createBufferSource();
+        const newBuffer = audioContext.createBuffer(2, buffers[0].length, 16000);
+        newBuffer.getChannelData(0).set(buffers[0]);
+        newBuffer.getChannelData(1).set(buffers[1]);
+        newSource.buffer = newBuffer;
+        newSource.connect(audioContext.destination);
+        newSource.start(0);
     }
 }
-
