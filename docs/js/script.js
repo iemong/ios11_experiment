@@ -2346,7 +2346,7 @@ var MicRecording = function (_EventEmitter) {
             return new _promise2.default(function (resolve, reject) {
                 var input = _this2.sourceNode;
                 var rec = new _recorderjs2.default(input, {
-                    sampleRate: 16000,
+                    sampleRate: 44100,
                     scale: 1
                 });
                 rec.record();
@@ -2751,7 +2751,7 @@ function init(stream) {
 
     function makeSonudfromBuffer(buffers) {
         var newSource = audioContext.createBufferSource();
-        var newBuffer = audioContext.createBuffer(2, buffers[0].length, 16000);
+        var newBuffer = audioContext.createBuffer(2, buffers[0].length, 44100);
         newBuffer.getChannelData(0).set(buffers[0]);
         newBuffer.getChannelData(1).set(buffers[1]);
         newSource.buffer = newBuffer;

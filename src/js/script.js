@@ -62,7 +62,7 @@ function init (stream) {
     
     function makeSonudfromBuffer( buffers ) {
         const newSource = audioContext.createBufferSource();
-        const newBuffer = audioContext.createBuffer(2, buffers[0].length, 16000);
+        const newBuffer = audioContext.createBuffer(2, buffers[0].length, 44100);
         newBuffer.getChannelData(0).set(buffers[0]);
         newBuffer.getChannelData(1).set(buffers[1]);
         newSource.buffer = newBuffer;

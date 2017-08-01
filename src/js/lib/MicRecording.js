@@ -14,7 +14,7 @@ export default class MicRecording extends EventEmitter {
         return new Promise((resolve, reject) => {
             const input = this.sourceNode;
             const rec = new Recorder(input, {
-                sampleRate: 16000,
+                sampleRate: 44100,
                 scale: 1
             });
             rec.record();
