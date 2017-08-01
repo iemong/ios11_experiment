@@ -5,6 +5,7 @@ import locationParams from './lib/locationParams';
 import SupportedAudioContext from './lib/SupportedAudioContext';
 import { enableButton, disableButton } from './lib/buttonState';
 import controlRecording from './lib/controlRecording';
+import makeSonudfromBuffer from './lib/makeSoundFromBuffer';
 
 const medias = {audio : true, video : false};
 const initializeButton = document.querySelector('.js-microphone-button');
@@ -48,25 +49,30 @@ function init (stream) {
 
     enableButton();
     if (isSP) {
-        recorderButton.addEventListener('touchend', () => {
-            controlRecording(micRecording);
-        });
+        touchend();
     } else {
+        click();
+    }
+    function click() {
         recorderButton.addEventListener('click', () => {
             controlRecording(micRecording);
         });
+        recordedSetup.addEventListener('click', () => {
+            makeSonudfromBuffer(
+                audioContext, 
+                micRecording.getRecodedBuffers()
+            );
+        });
     }
-    recordedSetup.addEventListener('click', () => {
-        makeSonudfromBuffer(micRecording.getRecodedBuffers());
-    });
-    
-    function makeSonudfromBuffer( buffers ) {
-        const newSource = audioContext.createBufferSource();
-        const newBuffer = audioContext.createBuffer(2, buffers[0].length, 22050);
-        newBuffer.getChannelData(0).set(buffers[0]);
-        newBuffer.getChannelData(1).set(buffers[1]);
-        newSource.buffer = newBuffer;
-        newSource.connect(audioContext.destination);
-        newSource.start(0);
+    function touchend() {
+        recorderButton.addEventListener('click', () => {
+            controlRecording(micRecording);
+        });
+        recordedSetup.addEventListener('click', () => {
+            makeSonudfromBuffer(
+                audioContext, 
+                micRecording.getRecodedBuffers()
+            );
+        });
     }
 }

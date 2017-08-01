@@ -2346,7 +2346,7 @@ var MicRecording = function (_EventEmitter) {
             return new _promise2.default(function (resolve, reject) {
                 var input = _this2.sourceNode;
                 var rec = new _recorderjs2.default(input, {
-                    sampleRate: 44100,
+                    sampleRate: 22050,
                     scale: 1
                 });
                 rec.record();
@@ -2386,7 +2386,7 @@ var MicRecording = function (_EventEmitter) {
 
 exports.default = MicRecording;
 
-},{"./SupportedAudioContext":108,"./recorderjs":115,"babel-runtime/core-js/object/get-prototype-of":3,"babel-runtime/core-js/promise":5,"babel-runtime/helpers/classCallCheck":8,"babel-runtime/helpers/createClass":9,"babel-runtime/helpers/inherits":10,"babel-runtime/helpers/possibleConstructorReturn":11,"events":103}],108:[function(require,module,exports){
+},{"./SupportedAudioContext":108,"./recorderjs":116,"babel-runtime/core-js/object/get-prototype-of":3,"babel-runtime/core-js/promise":5,"babel-runtime/helpers/classCallCheck":8,"babel-runtime/helpers/createClass":9,"babel-runtime/helpers/inherits":10,"babel-runtime/helpers/possibleConstructorReturn":11,"events":103}],108:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2506,6 +2506,23 @@ var locationParams = _querystring2.default.parse((location.search || '').replace
 exports.default = locationParams;
 
 },{"querystring":106}],114:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.default = makeSonudfromBuffer;
+function makeSonudfromBuffer(audioContext, buffers) {
+    var newSource = audioContext.createBufferSource();
+    var newBuffer = audioContext.createBuffer(2, buffers[0].length, 22050);
+    newBuffer.getChannelData(0).set(buffers[0]);
+    newBuffer.getChannelData(1).set(buffers[1]);
+    newSource.buffer = newBuffer;
+    newSource.connect(audioContext.destination);
+    newSource.start(0);
+}
+
+},{}],115:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2543,7 +2560,7 @@ function micWave(stream, audioContext, sourceNode) {
     draw();
 }
 
-},{}],115:[function(require,module,exports){
+},{}],116:[function(require,module,exports){
 'use strict';
 
 var WORKER_PATH = './recorderWorker.js';
@@ -2666,7 +2683,7 @@ Recorder.forceDownload = function (blob, filename) {
 
 module.exports = Recorder;
 
-},{}],116:[function(require,module,exports){
+},{}],117:[function(require,module,exports){
 'use strict';
 
 var _device = require('./lib/device');
@@ -2694,6 +2711,10 @@ var _buttonState = require('./lib/buttonState');
 var _controlRecording = require('./lib/controlRecording');
 
 var _controlRecording2 = _interopRequireDefault(_controlRecording);
+
+var _makeSoundFromBuffer = require('./lib/makeSoundFromBuffer');
+
+var _makeSoundFromBuffer2 = _interopRequireDefault(_makeSoundFromBuffer);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2737,27 +2758,26 @@ function init(stream) {
 
     (0, _buttonState.enableButton)();
     if (_device2.default) {
-        recorderButton.addEventListener('touchend', function () {
-            (0, _controlRecording2.default)(micRecording);
-        });
+        touchend();
     } else {
+        click();
+    }
+    function click() {
         recorderButton.addEventListener('click', function () {
             (0, _controlRecording2.default)(micRecording);
         });
+        recordedSetup.addEventListener('click', function () {
+            (0, _makeSoundFromBuffer2.default)(audioContext, micRecording.getRecodedBuffers());
+        });
     }
-    recordedSetup.addEventListener('click', function () {
-        makeSonudfromBuffer(micRecording.getRecodedBuffers());
-    });
-
-    function makeSonudfromBuffer(buffers) {
-        var newSource = audioContext.createBufferSource();
-        var newBuffer = audioContext.createBuffer(2, buffers[0].length, 44100);
-        newBuffer.getChannelData(0).set(buffers[0]);
-        newBuffer.getChannelData(1).set(buffers[1]);
-        newSource.buffer = newBuffer;
-        newSource.connect(audioContext.destination);
-        newSource.start(0);
+    function touchend() {
+        recorderButton.addEventListener('click', function () {
+            (0, _controlRecording2.default)(micRecording);
+        });
+        recordedSetup.addEventListener('click', function () {
+            (0, _makeSoundFromBuffer2.default)(audioContext, micRecording.getRecodedBuffers());
+        });
     }
 }
 
-},{"./lib/MicRecording":107,"./lib/SupportedAudioContext":108,"./lib/buttonState":109,"./lib/controlRecording":110,"./lib/device":112,"./lib/locationParams":113,"./lib/micWave":114}]},{},[116]);
+},{"./lib/MicRecording":107,"./lib/SupportedAudioContext":108,"./lib/buttonState":109,"./lib/controlRecording":110,"./lib/device":112,"./lib/locationParams":113,"./lib/makeSoundFromBuffer":114,"./lib/micWave":115}]},{},[117]);
