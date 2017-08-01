@@ -2411,7 +2411,7 @@ var MicWaves = function () {
         this._audioContext = opts.audioContext;
         this._sourceNode = opts.sourceNode;
         this._analyserNode = null;
-        this._canvas = document.querySelector('.js-sound-wave');
+        this._canvas = opts.canvas;
         this._drawContext = this._canvas.getContext('2d');
         this._cw = this._canvas.width;
         this._ch = this._canvas.height;
@@ -2576,12 +2576,21 @@ var locationParams = _querystring2.default.parse((location.search || '').replace
 exports.default = locationParams;
 
 },{"querystring":106}],115:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.default = makeSonudfromBuffer;
+
+var _MicWaves = require('./MicWaves');
+
+var _MicWaves2 = _interopRequireDefault(_MicWaves);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var recordedCanvas = document.querySelector('.js-recorded-wave');
+
 function makeSonudfromBuffer(audioContext, buffers) {
     var newSource = audioContext.createBufferSource();
     var newBuffer = audioContext.createBuffer(2, buffers[0].length, 22050);
@@ -2590,9 +2599,15 @@ function makeSonudfromBuffer(audioContext, buffers) {
     newSource.buffer = newBuffer;
     newSource.connect(audioContext.destination);
     newSource.start(0);
+
+    var micWaves = new _MicWaves2.default({
+        audioContext: audioContext,
+        sourceNode: newSource,
+        canvas: recordedCanvas
+    });
 }
 
-},{}],116:[function(require,module,exports){
+},{"./MicWaves":108}],116:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2796,6 +2811,7 @@ var medias = { audio: true, video: false };
 var initializeButton = document.querySelector('.js-microphone-button');
 var recorderButton = document.querySelector('.js-recorder-button');
 var recordedSetup = document.querySelector('.js-recorded-setup');
+var currentCanvas = document.querySelector('.js-sound-wave');
 
 var successCallback = function successCallback(stream) {
     if (_device2.default) {
@@ -2830,7 +2846,8 @@ function init(stream) {
     // マイクの音をそのまま波形で出す
     var micWaves = new _MicWaves2.default({
         audioContext: audioContext,
-        sourceNode: sourceNode
+        sourceNode: sourceNode,
+        canvas: currentCanvas
     });
 
     (0, _buttonState.enableButton)();
