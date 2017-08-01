@@ -7,7 +7,7 @@
 // modules
 @import 'module/*';
 
-h1 {
+.title {
     text-align: center;
     font-weight: bold;
     margin: 40px;
@@ -21,5 +21,5 @@ button,
 audio,
 a {
     display: block;
-    margin: 40px;
+    margin: 20px;
 }
