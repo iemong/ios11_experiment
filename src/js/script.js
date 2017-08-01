@@ -12,6 +12,7 @@ const medias = {audio : true, video : false};
 const initializeButton = document.querySelector('.js-microphone-button');
 const recorderButton = document.querySelector('.js-recorder-button');
 const recordedSetup = document.querySelector('.js-recorded-setup');
+const currentCanvas = document.querySelector('.js-sound-wave');
 
 const successCallback = (stream) => {
     if(isSP) {
@@ -48,7 +49,8 @@ function init (stream) {
     // マイクの音をそのまま波形で出す
     const micWaves = new MicWaves({
         audioContext: audioContext,
-        sourceNode: sourceNode
+        sourceNode: sourceNode,
+        canvas: currentCanvas
     });
 
     enableButton();

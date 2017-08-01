@@ -3,7 +3,7 @@ export default class MicWaves {
         this._audioContext = opts.audioContext;
         this._sourceNode = opts.sourceNode;
         this._analyserNode = null;
-        this._canvas = document.querySelector('.js-sound-wave');
+        this._canvas = opts.canvas;
         this._drawContext = this._canvas.getContext('2d');
         this._cw = this._canvas.width;
         this._ch = this._canvas.height;

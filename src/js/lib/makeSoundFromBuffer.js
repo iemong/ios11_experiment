@@ -1,3 +1,7 @@
+import MicWaves from './MicWaves';
+
+const recordedCanvas = document.querySelector('.js-recorded-wave');
+
 export default function makeSonudfromBuffer(audioContext, buffers) {
     const newSource = audioContext.createBufferSource();
     const newBuffer = audioContext.createBuffer(2, buffers[0].length, 22050);
@@ -6,4 +10,10 @@ export default function makeSonudfromBuffer(audioContext, buffers) {
     newSource.buffer = newBuffer;
     newSource.connect(audioContext.destination);
     newSource.start(0);
+
+    const micWaves = new MicWaves({
+        audioContext: audioContext,
+        sourceNode: newSource,
+        canvas: recordedCanvas
+    });
 }
