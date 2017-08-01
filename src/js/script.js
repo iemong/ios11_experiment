@@ -53,6 +53,7 @@ function init (stream) {
     } else {
         click();
     }
+
     function click() {
         recorderButton.addEventListener('click', () => {
             controlRecording(micRecording);
@@ -65,10 +66,10 @@ function init (stream) {
         });
     }
     function touchend() {
-        recorderButton.addEventListener('click', () => {
+        recorderButton.addEventListener('touchend', () => {
             controlRecording(micRecording);
         });
-        recordedSetup.addEventListener('click', () => {
+        recordedSetup.addEventListener('touchend', () => {
             makeSonudfromBuffer(
                 audioContext, 
                 micRecording.getRecodedBuffers()
