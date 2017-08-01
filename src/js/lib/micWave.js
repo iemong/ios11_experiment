@@ -3,7 +3,7 @@ const drawContext = canvas.getContext('2d');
 const cw = canvas.width;
 const ch = canvas.height;
 
-export default function micWave (stream, audioContext, sourceNode){
+export default function micWave (audioContext, sourceNode){
     const analyserNode = audioContext.createAnalyser();
     analyserNode.fftSize = 1024;
     sourceNode.connect(analyserNode);

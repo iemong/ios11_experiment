@@ -6,6 +6,7 @@ import SupportedAudioContext from './lib/SupportedAudioContext';
 import { enableButton, disableButton } from './lib/buttonState';
 import controlRecording from './lib/controlRecording';
 import makeSonudfromBuffer from './lib/makeSoundFromBuffer';
+import MicWaves from './lib/MicWaves';
 
 const medias = {audio : true, video : false};
 const initializeButton = document.querySelector('.js-microphone-button');
@@ -45,7 +46,10 @@ function init (stream) {
         source: sourceNode
     });
     // マイクの音をそのまま波形で出す
-    micWave(stream, audioContext, sourceNode);
+    const micWaves = new MicWaves({
+        audioContext: audioContext,
+        sourceNode: sourceNode
+    });
 
     enableButton();
     if (isSP) {
