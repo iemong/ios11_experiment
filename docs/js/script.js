@@ -2762,6 +2762,7 @@ function init(stream) {
     } else {
         click();
     }
+
     function click() {
         recorderButton.addEventListener('click', function () {
             (0, _controlRecording2.default)(micRecording);
@@ -2771,10 +2772,10 @@ function init(stream) {
         });
     }
     function touchend() {
-        recorderButton.addEventListener('click', function () {
+        recorderButton.addEventListener('touchend', function () {
             (0, _controlRecording2.default)(micRecording);
         });
-        recordedSetup.addEventListener('click', function () {
+        recordedSetup.addEventListener('touchend', function () {
             (0, _makeSoundFromBuffer2.default)(audioContext, micRecording.getRecodedBuffers());
         });
     }
